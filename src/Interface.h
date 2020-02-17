@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <iterator>
 #include <functional>
+#include <sstream>
 #include <stack>
 
 #ifdef _WIN32

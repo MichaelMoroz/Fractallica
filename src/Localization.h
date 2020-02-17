@@ -6,10 +6,10 @@
 #include <vector>
 #include <string>
 #include <filesystem>
-#include <Level.h>
 #include <locale>
 #include <Res.h>
 #include <codecvt>
+#include <Resources.h>
 
 namespace fs = std::filesystem;
 

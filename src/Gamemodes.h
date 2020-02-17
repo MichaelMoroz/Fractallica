@@ -1,8 +1,11 @@
 #pragma once
 
+#include<Resources.h>
+#include<Settings.h>
 #include<config.h>
 #include<Localization.h>
 #include<Interface.h>
+#include<Renderer.h>
 
 #define DEBUG_MODE 1
 

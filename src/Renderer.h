@@ -1,5 +1,5 @@
 #pragma once
-
+#include<Resources.h>
 #include<Shaders.h>
 #include<ExprParser.h>
 
@@ -15,8 +15,6 @@ class WorldModel
 {
 	//TODO in v1.5
 };
-
-std::vector<fs::path> GetFilesInFolder(std::string folder, std::string filetype);
 
 class Renderer
 {

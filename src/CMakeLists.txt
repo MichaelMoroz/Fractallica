@@ -8,6 +8,9 @@ add_library(FractallicaSources
 
   Settings.h
   Settings.cpp
+  
+  Resources.h
+  Resources.cpp
 
   Gamemodes.h
   Gamemodes.cpp
@@ -20,4 +23,7 @@ add_library(FractallicaSources
   
   Camera.h
   Camera.cpp
+
+  ExprParser.h
+  ExprParser.cpp
 )

@@ -43,7 +43,7 @@ void OpenMainMenu()
 	mainmenu.static_object = true;
 
 	//TITLE
-	Text ttl("Marble\nMarcher", LOCAL("default"), 120, sf::Color::White);
+	Text ttl("Fractallica", LOCAL("default"), 120, sf::Color::White);
 	ttl.SetBorderColor(sf::Color::Black);
 	ttl.SetBorderWidth(4);
 	mainmenu.AddObject(&ttl, Object::Allign::LEFT);
@@ -52,7 +52,7 @@ void OpenMainMenu()
 	margin1.SetBackgroundColor(sf::Color::Transparent);
 	mainmenu.AddObject(&margin1, Object::Allign::LEFT);
 
-	Text CE("Community Edition", LOCAL("default"), 60, sf::Color::White);
+	Text CE("Alpha " + std::string(PROJECT_VER), LOCAL("default"), 60, sf::Color::White);
 	CE.SetBorderColor(sf::Color::Black);
 	CE.SetBorderWidth(4);
 	mainmenu.AddObject(&CE, Object::Allign::LEFT);
@@ -73,7 +73,7 @@ void OpenMainMenu()
 	exitbtn.AddObject(&button6, Object::Allign::CENTER);
 	mainmenu.AddObject(&exitbtn, Object::Allign::LEFT);
 
-	Text about(utf8_to_wstring(YEAR + std::string(" ") + PROJECT_VER + std::string(" ")) + LOCAL["About"], LOCAL("mono"), 30, sf::Color::White);
+	Text about(utf8_to_wstring(YEAR + std::string(" ")) + LOCAL["About"], LOCAL("mono"), 30, sf::Color::White);
 	about.SetBorderColor(sf::Color::Black);
 	about.SetBorderWidth(3);
 	mainmenu.AddObject(&about, Object::Allign::LEFT);
@@ -315,9 +315,6 @@ void ApplySettings(void *data)
 	std::vector<std::string> configs = renderer_ptr->GetConfigurationsList();
 
 	InitializeRendering(configs[SETTINGS.stg.shader_config]);
-
-	if (current_music != nullptr)
-		current_music->setVolume(SETTINGS.stg.music_volume);
 }
 
 void RestoreSettings(void* data)

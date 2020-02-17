@@ -1,7 +1,4 @@
 #include "Renderer.h"
-#include "Renderer.h"
-#include "Renderer.h"
-
 
 Renderer::Renderer(int w, int h, std::string config_file)
 {

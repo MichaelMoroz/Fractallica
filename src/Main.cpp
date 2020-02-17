@@ -1,5 +1,4 @@
 #include <Gamemodes.h>
-#include "Level.h"
 #include "Res.h"
 #include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
@@ -53,9 +52,9 @@ int main(int argc, char *argv[]) {
 	window.requestFocus();
 	UpdateAspectRatio(window.getSize().x, window.getSize().y);
 	//set window icon
-	sf::Image icon;
-	icon.loadFromFile(icon_png); 
-	window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+	//sf::Image icon;
+	//icon.loadFromFile(icon_png); 
+	//window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
 	rend.LoadExternalTextures(textures_folder);
   
