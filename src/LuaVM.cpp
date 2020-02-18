@@ -41,7 +41,7 @@ std::string LuaVM::check_error_msg()
 	return errstr;
 }
 
-float LuaVM::getVarNum(std::string var, int stack_depth = -1)
+float LuaVM::getVarNum(std::string var, int stack_depth)
 {
 	lua_getglobal(L, var.c_str());
 	if (lua_isnumber(L, stack_depth))
@@ -51,7 +51,7 @@ float LuaVM::getVarNum(std::string var, int stack_depth = -1)
 	else return 0.0f; //NaN
 }
 
-std::string LuaVM::getVarStr(std::string var, int stack_depth = -1)
+std::string LuaVM::getVarStr(std::string var, int stack_depth)
 {
 	if (lua_isstring(L, stack_depth))
 	{

@@ -10,6 +10,7 @@
 #include <fstream>
 #include <thread>
 #include <mutex>
+#include <LuaVM.h>
 
 #ifdef _WIN32
 #include <Windows.h>
