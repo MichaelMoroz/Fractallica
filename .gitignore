@@ -1,7 +1,7 @@
 .vscode
 .DS_Store
 build
-src/resources.c*
+src/resources.c
 MarbleMarcher.app
 winBuild
 MarbleMarcher.exe

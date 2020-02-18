@@ -24,6 +24,8 @@ if (WIN32)
 		set(SFML_DIR C:/Libraries/SFML-2.5.1/lib/cmake/SFML)
 		set(SFML_INCLUDE_DIR C:/Libraries/SFML-2.5.1/include)
 		set(GLEW_LIBRARIES ${GLEW_DIR}/lib/Release/Win32/glew32.lib)
+		set(LUA_INCLUDE_DIR C:/Libraries/Lua5.3/include)
+		set(LUA_LIBRARIES C:/Libraries/Lua5.3/lua53.lib)
 	else()
 	#64 bit compilation
 		set(SFML_DIR C:/Libraries/SFML-2.5.1_64/lib/cmake/SFML)
