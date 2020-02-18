@@ -18,12 +18,7 @@
 #define ERROR_MSG(x) std::cerr << x << std::endl;
 #endif
 
-extern "C"
-{
-	#include<lua.h>
-	#include<lauxlib.h>
-	#include<lualib.h>
-}
+
 
 #if defined(_WIN32)
 int WinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR lpCmdLine, int nCmdShow) {
@@ -31,8 +26,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR lpCmdLine, int nCmdShow) {
 int main(int argc, char *argv[]) {
 #endif
 	bool first_start = SETTINGS.Load(settings_bin);
-
-	lua_State* L = luaL_newstate();
 
 	//all of the fonts
 	Fonts fonts;
