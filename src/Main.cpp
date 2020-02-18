@@ -18,9 +18,12 @@
 #define ERROR_MSG(x) std::cerr << x << std::endl;
 #endif
 
-//Graphics settings
-bool TOUCH_MODE = false;
-bool DEBUG_BAR = false;
+extern "C"
+{
+	#include<lua.h>
+	#include<lauxlib.h>
+	#include<lualib.h>
+}
 
 #if defined(_WIN32)
 int WinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR lpCmdLine, int nCmdShow) {
@@ -28,6 +31,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR lpCmdLine, int nCmdShow) {
 int main(int argc, char *argv[]) {
 #endif
 	bool first_start = SETTINGS.Load(settings_bin);
+
+	lua_State* L = luaL_newstate();
 
 	//all of the fonts
 	Fonts fonts;
@@ -94,7 +99,7 @@ int main(int argc, char *argv[]) {
 		io_state.wheel = mouse_wheel;
 		io_state.mouse_press[2] = false;
 		io_state.mouse_press[0] = false;
-		TOUCH_MODE = SETTINGS.stg.touch_mode;
+		bool TOUCH_MODE = SETTINGS.stg.touch_mode;
 
 		for (int i = 0; i < n_touch; i++)
 		{
