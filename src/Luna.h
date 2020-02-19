@@ -84,7 +84,7 @@ template < class T > class Luna {
 		}
 		
 		luaL_newmetatable(L, T::className);
-		int             metatable = lua_gettop(L);
+		int metatable = lua_gettop(L);
 		
 		lua_pushstring(L, "__gc");
 		lua_pushcfunction(L, &Luna < T >::gc_obj);

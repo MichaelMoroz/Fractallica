@@ -13,5 +13,5 @@ int ObjectLua::Create(lua_State* L)
 
 void WrapInterface(LuaVM* LVM)
 {
-	Luna < ObjectLua >::Register(LVM., "Interface");
+	Luna < ObjectLua >::Register(LVM->get_L(), "Interface");
 }
