@@ -64,8 +64,3 @@ LuaVM::~LuaVM()
 {
 	lua_close(L);
 }
-
-lua_State* LuaVM::get_L()
-{
-	return L;
-}

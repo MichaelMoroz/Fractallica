@@ -636,10 +636,23 @@ void Object::Draw(sf::RenderWindow * window, InputState & state)
 	//nothing to draw
 }
 
+/*
+	Adds a copy of the object to the array
+*/
 void Object::AddObject(Object * something, Allign a)
 {
 	something->obj_allign = a;
 	objects.push_back(std::unique_ptr<Object>(something->GetCopy()));
+	this->SetInsideSize(defaultstate.inside_size + something->defaultstate.size.y + something->defaultstate.margin);
+}
+
+/*
+	Adds a reference of the object to the array
+*/
+void Object::AddReference(Object* something, Allign a)
+{
+	something->obj_allign = a;
+	objects.push_back(std::unique_ptr<Object>(something));
 	this->SetInsideSize(defaultstate.inside_size + something->defaultstate.size.y + something->defaultstate.margin);
 }
 
@@ -891,6 +904,11 @@ void Window::Add(Object* something, Allign a)
 	objects[1].get()->AddObject(something, a);
 }
 
+void Window::AddRef(Object* something, Allign a)
+{
+	objects[1].get()->AddReference(something, a);
+}
+
 Window::Window(Window & A)
 {
 	*this = A;
@@ -956,10 +974,8 @@ InputState::InputState(bool a[sf::Keyboard::KeyCount], bool b[3], sf::Vector2f c
 	std::copy(b, b + 2, mouse);
 }
 
-void MenuBox::AddObject(Object * something, Allign a)
+void MenuBox::UpdateSlider()
 {
-	this->objects[0].get()->AddObject(something, a);
-
 	//update the slider
 	float inside_size = this->objects[0].get()->defaultstate.inside_size;
 	float height = this->objects[0].get()->defaultstate.size.y;
@@ -981,6 +997,18 @@ void MenuBox::AddObject(Object * something, Allign a)
 		this->objects[1].get()->objects[0].get()->SetHeigth(new_h);
 		this->objects[1].get()->SetHeigth(height);
 	}
+}
+
+void MenuBox::AddObject(Object * something, Allign a)
+{
+	this->objects[0].get()->AddObject(something, a);
+	UpdateSlider();
+}
+
+void MenuBox::AddReference(Object* something, Allign a)
+{
+	this->objects[0].get()->AddReference(something, a);
+	UpdateSlider();
 }
 
 void MenuBox::Cursor(int d)

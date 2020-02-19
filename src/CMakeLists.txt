@@ -3,6 +3,9 @@ add_library(FractallicaSources
   Interface.h
   Interface.cpp
   
+  InterfaceLua.h
+  InterfaceLua.cpp
+  
   Localization.h
   Localization.cpp
 
@@ -12,6 +15,8 @@ add_library(FractallicaSources
   Resources.h
   Resources.cpp
   
+  Luna.h
+
   LuaVM.h
   LuaVM.cpp
 
@@ -23,6 +28,9 @@ add_library(FractallicaSources
   
   Shaders.h
   Shaders.cpp
+  
+  ShadersLua.h
+  ShadersLua.cpp
   
   Camera.h
   Camera.cpp

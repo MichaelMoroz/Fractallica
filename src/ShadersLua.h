@@ -25,8 +25,6 @@ public:
 	bool DoFile(std::string file_location);
 	std::string check_error_msg();
 
-	lua_State* get_L();
-
 	float getVarNum(std::string var, int stack_depth = -1);
 	std::string getVarStr(std::string var, int stack_depth = -1);
 

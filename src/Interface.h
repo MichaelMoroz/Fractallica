@@ -10,6 +10,7 @@
 #include <functional>
 #include <sstream>
 #include <stack>
+#include <LuaVM.h>
 
 #ifdef _WIN32
 #define ERROR_MSG(x) MessageBox(nullptr, TEXT(x), TEXT("ERROR"), MB_OK);
@@ -149,6 +150,7 @@ public:
 
 	virtual void Draw(sf::RenderWindow * window, InputState& state);
 	virtual void AddObject(Object* a, Allign b);
+	virtual void AddReference(Object* a, Allign b);
 	void Update(sf::RenderWindow * window, InputState& state);
 	void UpdateAction(sf::RenderWindow * window, InputState& state);
 	
@@ -244,7 +246,10 @@ public:
 
 	sf::Vector2f dmouse;
 
+	void UpdateSlider();
+
 	virtual void AddObject(Object * something, Allign a);
+	virtual void AddReference(Object* something, Allign a);
 
 	void Cursor(int d);
 
@@ -271,6 +276,7 @@ public:
 	sf::Vector2f dmouse;
 
 	void Add(Object * something, Allign a = LEFT);
+	void AddRef(Object* something, Allign a = LEFT);
 
 	template<class T>
 	Window(float x, float y, float dx, float dy, sf::Color color_main = default_main_color, T title = LOCAL["Window"], sf::Font & font = LOCAL("default"));
