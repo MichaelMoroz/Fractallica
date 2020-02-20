@@ -33,3 +33,5 @@ private:
 	int errcode;
 	std::string errstr;
 };
+
+extern LuaVM LUA;
