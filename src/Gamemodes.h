@@ -6,6 +6,7 @@
 #include<Localization.h>
 #include<Interface.h>
 #include<Renderer.h>
+#include<LuaVM.h>
 
 #define DEBUG_MODE 1
 
@@ -38,6 +39,10 @@ extern InputState io_state;
 extern float target_fps;
 
 extern GameMode game_mode;
+
+void RunInitialScript();
+void RunLoopScript();
+void RunRenderScript();
 
 void OpenMainMenu();
 void OpenTestWindow();

@@ -18,6 +18,9 @@
 #include <string>
 
 static const int num_level_music = 4;
+static const char main_lua[] = "scripts/main.lua";
+static const char loop_lua[] = "scripts/loop.lua";
+static const char render_lua[] = "scripts/render.lua";
 static const char settings_bin[] = "assets/settings.bin";
 static const char main_config[] = "scripts/compute/MAIN.cfg";
 static const char textures_folder[] = "textures/";

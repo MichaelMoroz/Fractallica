@@ -1,5 +1,7 @@
 #include "LuaVM.h"
 
+LuaVM LUA;
+
 LuaVM::LuaVM()
 {
 	errcode = LUA_OK;
@@ -36,9 +38,9 @@ bool LuaVM::DoFile(std::string file_location)
 	}
 }
 
-std::string LuaVM::check_error_msg()
+std::pair<int, std::string> LuaVM::check_error_msg()
 {
-	return errstr;
+	return std::pair<int, std::string>(errcode, errstr);
 }
 
 float LuaVM::getVarNum(std::string var, int stack_depth)

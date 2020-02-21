@@ -64,7 +64,8 @@ int main(int argc, char *argv[]) {
 	float prev_s = 0;
 	
 	OpenMainMenu();
-	
+	RunInitialScript();
+
 	#define n_touch 5
 	sf::Vector2i touch_xy[n_touch];
 	sf::Vector2i touch_pxy[n_touch];
@@ -118,109 +119,95 @@ int main(int argc, char *argv[]) {
 
 		while (window.pollEvent(event)) 
 		{
-			if (event.type == sf::Event::Closed) 
+			sf::FloatRect visibleArea(0, 0, event.size.width, event.size.height);
+			const sf::Keyboard::Key keycode = event.key.code;
+			switch (event.type)
 			{
+			case sf::Event::Closed:
 				window.close();
 				break;
-			}
-			else if (event.type == sf::Event::Resized) 
-			{
-				sf::FloatRect visibleArea(0, 0, event.size.width, event.size.height);
+			case sf::Event::Resized:
+			
 				default_window_view = sf::View(visibleArea);
 				window.setView(default_window_view);
 				io_state.window_size = sf::Vector2f(window.getSize().x, window.getSize().y);
 				UpdateAspectRatio(window.getSize().x, window.getSize().y);
 				rend.camera.SetAspectRatio((float)window.getSize().x / (float)window.getSize().y);
-			}
-
-			if (TOUCH_MODE)
-			{
-				if (event.type == sf::Event::TouchBegan)
+				break;
+			case sf::Event::TouchBegan:
+				touched[event.touch.finger] = true;
+				touch_pxy[event.touch.finger] = sf::Vector2i(event.touch.x, event.touch.y);
+				if (event.touch.finger < n_touch)
 				{
-					touched[event.touch.finger] = true;
-					touch_pxy[event.touch.finger] = sf::Vector2i(event.touch.x, event.touch.y);
-					if (event.touch.finger < n_touch)
+					touch_circle[event.touch.finger].setRadius(60);
+				}
+				//the joystick half of the screen
+				if (event.touch.x < window.getSize().x / 2)
+				{
+					if (joystick_finger < 0)
 					{
-						touch_circle[event.touch.finger].setRadius(60);
-					}
-					//the joystick half of the screen
-					if(event.touch.x < window.getSize().x/2)
-					{ 
-						if (joystick_finger < 0)
-						{
-							joystick_finger = event.touch.finger;
-							joystick.setRadius(120);
-							joystick.setPosition(event.touch.x - joystick.getRadius(), event.touch.y - joystick.getRadius());
-						}
-					}
-					else //the view half of the screen
-					{
-						if (view_finger < 0)
-						{
-							view_finger = event.touch.finger;
-						}
+						joystick_finger = event.touch.finger;
+						joystick.setRadius(120);
+						joystick.setPosition(event.touch.x - joystick.getRadius(), event.touch.y - joystick.getRadius());
 					}
 				}
-				if (event.type == sf::Event::TouchEnded)
+				else //the view half of the screen
 				{
-					touched[event.touch.finger] = false;
-					if (event.touch.finger < n_touch)
+					if (view_finger < 0)
 					{
-						touch_circle[event.touch.finger].setRadius(0);
-					}
-					if (joystick_finger == event.touch.finger)
-					{
-						joystick_finger = -1;
-						joystick.setRadius(0);
-					}
-					if (view_finger == event.touch.finger)
-					{
-						view_finger = -1;
+						view_finger = event.touch.finger;
 					}
 				}
-			}
-
-			if (event.type == sf::Event::JoystickButtonPressed)
-			{
+				break;
+			case sf::Event::TouchEnded:
+				touched[event.touch.finger] = false;
+				if (event.touch.finger < n_touch)
+				{
+					touch_circle[event.touch.finger].setRadius(0);
+				}
+				if (joystick_finger == event.touch.finger)
+				{
+					joystick_finger = -1;
+					joystick.setRadius(0);
+				}
+				if (view_finger == event.touch.finger)
+				{
+					view_finger = -1;
+				}
+				break;
+			case sf::Event::JoystickButtonPressed:
 				io_state.buttons[event.joystickButton.button] = true;
 				io_state.button_pressed[event.joystickButton.button] = true;
-			}
-			else if (event.type == sf::Event::JoystickButtonReleased)
-			{
+				break;
+			case sf::Event::JoystickButtonReleased:
 				io_state.buttons[event.joystickButton.button] = false;
-			}
-			else if (event.type == sf::Event::JoystickMoved)
-			{
-				io_state.axis_value[event.joystickMove.axis] = 
-					(abs(event.joystickMove.position)<SETTINGS.stg.gamepad_deadzone)?0.f:event.joystickMove.position;
+				break;
+			case sf::Event::JoystickMoved:
+				io_state.axis_value[event.joystickMove.axis] =
+					(abs(event.joystickMove.position) < SETTINGS.stg.gamepad_deadzone) ? 0.f : event.joystickMove.position;
 				io_state.axis_moved[event.joystickMove.axis] = true;
-			}
-			else if (event.type == sf::Event::KeyPressed)
-			{
-				const sf::Keyboard::Key keycode = event.key.code;
+				break;
+			case sf::Event::KeyPressed:
 				all_keys[keycode] = true;
 				io_state.isKeyPressed = true;
 				io_state.keys[keycode] = true;
-				io_state.key_press[keycode] = true;  
+				io_state.key_press[keycode] = true;
 				if (keycode == sf::Keyboard::Escape)
 				{
 					if (game_mode == MAIN_MENU)
 					{
-						if(NumberOfObjects() < 2)
+						if (NumberOfObjects() < 2)
 							ConfirmExit();
 					}
 				}
-			}
-			else if (event.type == sf::Event::KeyReleased) 
-			{
-				const sf::Keyboard::Key keycode = event.key.code;
+				break;
+			case sf::Event::KeyReleased:
 				if (event.key.code < 0 || event.key.code >= sf::Keyboard::KeyCount) { continue; }
 				all_keys[keycode] = false;
 				io_state.keys[keycode] = false;
-			}
-			else if (event.type == sf::Event::MouseButtonPressed)
-			{
-				if (event.mouseButton.button == sf::Mouse::Left) 
+				break;
+			case sf::Event::MouseButtonPressed:
+				if (event.mouseButton.button == sf::Mouse::Left)
 				{
 					mouse_pos = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
 					mouse_clicked = true;
@@ -229,13 +216,12 @@ int main(int argc, char *argv[]) {
 				}
 				else if (event.mouseButton.button == sf::Mouse::Right && !TOUCH_MODE)
 				{
-					io_state.mouse[2] = true; 
+					io_state.mouse[2] = true;
 					io_state.mouse_press[2] = true;
 				}
-			}
-			else if (event.type == sf::Event::MouseButtonReleased)
-			{
-				if (event.mouseButton.button == sf::Mouse::Left) 
+				break;
+			case sf::Event::MouseButtonReleased:
+				if (event.mouseButton.button == sf::Mouse::Left)
 				{
 					io_state.mouse[0] = false;
 					mouse_pos = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
@@ -244,31 +230,28 @@ int main(int argc, char *argv[]) {
 				else if (event.mouseButton.button == sf::Mouse::Right) {
 					io_state.mouse[2] = false;
 				}
-			}
-			else if (event.type == sf::Event::MouseMoved) 
-			{
+				break;
+			case sf::Event::MouseMoved:
 				mouse_pos = sf::Vector2i(event.mouseMove.x, event.mouseMove.y);
 				io_state.mouse_pos = sf::Vector2f(mouse_pos.x, mouse_pos.y);
-			}
-			else if (event.type == sf::Event::MouseWheelScrolled)
-			{
+				break;
+			case sf::Event::MouseWheelScrolled:
 				mouse_wheel += event.mouseWheelScroll.delta;
 				io_state.wheel = mouse_wheel;
+				break;
 			}
 		}
 
-		if (TOUCH_MODE)
+		//touch circles
+		int touches = 0;
+		for (int i = 0; i < n_touch; i++)
 		{
-			int touches = 0;
-			for (int i = 0; i < n_touch; i++)
+			if (touched[i])
 			{
-				if (touched[i])
-				{
-					touches++;
-					//touch state
-					touch_xy[i] = sf::Touch::getPosition(i, window);
-					touch_circle[i].setPosition(touch_xy[i].x - touch_circle[i].getRadius(), touch_xy[i].y - touch_circle[i].getRadius());
-				}
+				touches++;
+				//touch state
+				touch_xy[i] = sf::Touch::getPosition(i, window);
+				touch_circle[i].setPosition(touch_xy[i].x - touch_circle[i].getRadius(), touch_xy[i].y - touch_circle[i].getRadius());
 			}
 		}
 	
@@ -285,16 +268,7 @@ int main(int argc, char *argv[]) {
 			{
 				if (!(taken_screenshot && SETTINGS.stg.screenshot_preview))
 				{
-					rend.camera.SetAspectRatio((float)window.getSize().x / (float)window.getSize().y);
-					rend.SetOutputTexture(main_txt);
-					//Draw to the render texture
-					rend.Render();
-					window.resetGLStates();
-					//Draw render texture to main window
-					sf::Sprite sprite(main_txt);
-					sprite.setScale(float(window.getSize().x) / float(rend.variables["width"]),
-						float(window.getSize().y) / float(rend.variables["height"]));
-					window.draw(sprite);
+				
 				}
 				else
 				{
@@ -357,6 +331,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
+	//Remove all interface objects
 	RemoveAllObjects();
 	return 0;
 }

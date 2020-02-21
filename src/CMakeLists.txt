@@ -15,8 +15,6 @@ add_library(FractallicaSources
   Resources.h
   Resources.cpp
   
-  Luna.h
-
   LuaVM.h
   LuaVM.cpp
 

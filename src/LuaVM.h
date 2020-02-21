@@ -14,8 +14,6 @@ extern "C"
 	#include<lualib.h>
 }
 
-#include <Luna.h>
-
 class LuaVM
 {
 public:
@@ -23,7 +21,7 @@ public:
 
 	bool DoString(std::string code);
 	bool DoFile(std::string file_location);
-	std::string check_error_msg();
+	std::pair<int, std::string> check_error_msg();
 
 	lua_State* get_L();
 

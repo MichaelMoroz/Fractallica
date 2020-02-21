@@ -30,6 +30,29 @@ void SetPointers(sf::RenderWindow *w, Renderer* rd, sf::Texture *main, sf::Textu
 	screenshot_txt = screensht;
 }
 
+/*
+	The scripts that runs 1 time at the launch
+*/
+void RunInitialScript()
+{
+	LUA.DoFile(main_lua);
+	auto e = LUA.check_error_msg();
+	if (e.first != LUA_OK)
+	{
+		DisplayError(e.second);
+	}
+}
+
+void RunLoopScript()
+{
+	LUA.DoFile(loop_lua);
+}
+
+void RunRenderScript()
+{
+	LUA.DoFile(render_lua);
+}
+
 void OpenMainMenu()
 {
 	RemoveAllObjects();
@@ -72,11 +95,6 @@ void OpenMainMenu()
 	}, true);
 	exitbtn.AddObject(&button6, Object::Allign::CENTER);
 	mainmenu.AddObject(&exitbtn, Object::Allign::LEFT);
-
-	Text about(utf8_to_wstring(YEAR + std::string(" ")) + LOCAL["About"], LOCAL("mono"), 30, sf::Color::White);
-	about.SetBorderColor(sf::Color::Black);
-	about.SetBorderWidth(3);
-	mainmenu.AddObject(&about, Object::Allign::LEFT);
 	
 
 	AddGlobalObject(mainmenu);
@@ -140,9 +158,9 @@ void ConfirmExit()
 void DisplayError(std::string error_text)
 {
 	sf::Vector2f wsize = default_size;
-	Window error_window(wsize.x*0.4f, wsize.y*0.4f, 400, 215, sf::Color(100, 0, 0, 128), LOCAL["Error"], LOCAL("default"));
+	Window error_window(wsize.x*0.5f - 640, wsize.y*0.5f, 1280, 215, sf::Color(100, 0, 0, 128), LOCAL["Lua compilation error"], LOCAL("default"));
 	
-	error_window.Add(new Text(error_text, LOCAL("default"), 30, sf::Color::Red), Object::Allign::CENTER);
+	error_window.Add(new Text(error_text, LOCAL("default"), 15, sf::Color::Red), Object::Allign::LEFT);
 
 	error_window.Add(new Button(LOCAL["Ok"], 240, 40,
 		[](sf::RenderWindow * window, InputState & state)
