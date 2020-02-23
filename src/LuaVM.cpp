@@ -62,6 +62,51 @@ std::string LuaVM::getVarStr(std::string var, int stack_depth)
 	else return std::string();
 }
 
+int LuaVM::newtable(std::string name)
+{
+	lua_newtable(L);
+	//get id of the top element of the stack
+	int TableIdx = lua_gettop(L);
+	//push table id to stack
+	lua_pushvalue(L, TableIdx);
+	//create a global object with this id
+	lua_setglobal(L, name.c_str());
+	return TableIdx;
+}
+
+void LuaVM::newmetatable(std::string name)
+{
+	luaL_newmetatable(L, name.c_str());
+}
+
+void LuaVM::setmetatable(std::string name, int stk_id)
+{
+	luaL_getmetatable(L, name.c_str());
+	lua_setmetatable(L, stk_id-1);
+}
+
+void LuaVM::pushfunction(std::string name, int(*fun)(lua_State * L))
+{
+	//push function pointer to stack
+	lua_pushcfunction(L, fun);
+	lua_setglobal(L, name.c_str());
+}
+
+void LuaVM::setfunction(std::string name, int(*fun)(lua_State * L))
+{
+	lua_pushstring(L, name.c_str());
+	lua_pushcfunction(L, fun);
+	lua_settable(L, -3);
+}
+
+void LuaVM::setvalue(std::string name, int val_id)
+{
+	lua_pushstring(L, name.c_str());
+	//push index to top
+	lua_pushvalue(L, val_id);
+	lua_settable(L, -3);
+}
+
 LuaVM::~LuaVM()
 {
 	lua_close(L);

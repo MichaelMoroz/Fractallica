@@ -179,7 +179,7 @@ public:
 	sf::View used_view;
 	
 	//multiple callbacks
-	std::vector<std::function<void(sf::RenderWindow * window, InputState & state)>> callback, hoverfn, defaultfn;
+	std::vector<call_func> callback, hoverfn, defaultfn;
 
 	//objects inside this object
 	std::vector<std::unique_ptr<Object>> objects;
@@ -322,7 +322,7 @@ class Button: public Box
 {
 public:
 	template<class T>
-	Button(T text, float w, float h, std::function<void(sf::RenderWindow * window, InputState & state)> fun, sf::Color color_hover = default_hover_main_color, sf::Color color_main = default_main_color);
+	Button(T text, float w, float h, call_func fun, sf::Color color_hover = default_hover_main_color, sf::Color color_main = default_main_color);
 
 	Button(Button& A);
 	Button(Button&& A);
@@ -437,7 +437,7 @@ inline Window::Window(float x, float y, float dx, float dy, sf::Color color_main
 }
 
 template<class T>
-inline Button::Button(T text, float w, float h, std::function<void(sf::RenderWindow*window, InputState&state)> fun, sf::Color color_hover, sf::Color color_main)
+inline Button::Button(T text, float w, float h, call_func fun, sf::Color color_hover, sf::Color color_main)
 {
 	SetSize(w, h);
 	SetBackgroundColor(color_main);

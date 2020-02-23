@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <filesystem>
+#include <functional>
 #include <Resources.h>
 
 extern "C"
@@ -27,6 +28,13 @@ public:
 
 	float getVarNum(std::string var, int stack_depth = -1);
 	std::string getVarStr(std::string var, int stack_depth = -1);
+
+	int newtable(std::string name);
+	void newmetatable(std::string name);
+	void setmetatable(std::string name, int stk_id = -1);
+	void pushfunction(std::string name, int(*fun)(lua_State * L));
+	void setfunction(std::string name,  int(*fun)(lua_State * L));
+	void setvalue(std::string name, int val_id);
 
 	~LuaVM();
 

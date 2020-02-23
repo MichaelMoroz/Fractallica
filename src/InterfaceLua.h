@@ -10,6 +10,7 @@
 #include <new>
 #include <LuaVM.h>
 #include <Interface.h>
+#include <Gamemodes.h>
 /*
 	Lua Fractallica interface classes wrapper
 */
