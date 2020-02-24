@@ -74,6 +74,8 @@ int LuaVM::newtable(std::string name)
 	return TableIdx;
 }
 
+//void LuaVM::runfunction(int stk_id, int in, int out = 1)
+
 void LuaVM::newmetatable(std::string name)
 {
 	luaL_newmetatable(L, name.c_str());

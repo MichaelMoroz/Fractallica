@@ -48,6 +48,7 @@ void OpenMainMenu();
 void OpenTestWindow();
 void ConfirmExit();
 void DisplayError(std::string error_text);
+void DisplayMessage(std::string text);
 void LockMouse(sf::RenderWindow& window);
 void UnlockMouse(sf::RenderWindow& window);
 void PauseGame(sf::RenderWindow& window);

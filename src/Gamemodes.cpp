@@ -178,6 +178,29 @@ void DisplayError(std::string error_text)
 	});
 }
 
+void DisplayMessage(std::string text)
+{
+	sf::Vector2f wsize = default_size;
+	Window error_window(wsize.x * 0.5f - 640, wsize.y * 0.5f, 1280, 215, sf::Color(100, 100, 100, 128), LOCAL["Information"], LOCAL("default"));
+
+	error_window.Add(new Text(text, LOCAL("default"), 15, sf::Color::White), Object::Allign::LEFT);
+
+	error_window.Add(new Button(LOCAL["Ok"], 240, 40,
+		[](sf::RenderWindow* window, InputState& state)
+		{
+
+		},
+		sf::Color(200, 40, 0, 255), sf::Color(128, 128, 128, 128)), Object::Allign::RIGHT);
+
+	int id = AddGlobalObject(error_window);
+
+	get_glob_obj(id).objects[1].get()->objects[0].get()->objects[1].get()->SetCallbackFunction(
+		[id](sf::RenderWindow* window, InputState& state)
+		{
+			Add2DeleteQueue(id);
+		});
+}
+
 void LockMouse(sf::RenderWindow& window) {
 	window.setMouseCursorVisible(false);
 	sf::Mouse::setPosition(sf::Vector2i(window.getSize().x*0.5, window.getSize().y*0.5), window);

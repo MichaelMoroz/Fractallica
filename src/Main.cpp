@@ -12,6 +12,7 @@
 #include <mutex>
 #include <LuaVM.h>
 #include <InterfaceLua.h>
+#include <ShadersLua.h>
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -65,6 +66,7 @@ int main(int argc, char *argv[]) {
 	float prev_s = 0;
 	
 	WrapInterface(&LUA);
+	WrapShaders(&LUA);
 
 	OpenMainMenu();
 	RunInitialScript();

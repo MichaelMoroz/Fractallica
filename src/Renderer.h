@@ -3,19 +3,6 @@
 #include<Shaders.h>
 #include<ExprParser.h>
 
-//TODO
-class Wobject
-{
-	vec3 position;
-	vec3 radius; //bounding volume radius
-
-};
-
-class WorldModel
-{
-	//TODO in v1.5
-};
-
 class Renderer
 {
 public:

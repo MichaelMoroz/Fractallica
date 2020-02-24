@@ -4,11 +4,20 @@
 
 --Load the table saving library
 dofile( "scripts/libs/table.save-1.0.lua" )
+dofile( "scripts/libs/definitions.lua" )
 
-OpenTestWindow();
+menu = MenuBox.new(250,600);
 
-box = Box.new(250,250);
+menu:SetPosition(300,500);
 
-box:SetPosition(300,500);
+menu:AddObject(Text.new("KEK", 50), Allign.LEFT);
 
-AddGlobalObject(box);
+AddGlobalObject(menu);
+
+camera = Camera.new();
+
+camera:setPosition(10, 15, 30);
+
+shadertest = ComputeShader.new("scripts/compute/noise/noise.glsl");
+
+shadertest:setCameraObj("Camera1", camera);
