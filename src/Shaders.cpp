@@ -8,12 +8,12 @@ std::string int2str(const int n)
 	return stm.str();
 }
 
-ComputeShader::ComputeShader()
+ComputeShader::ComputeShader(): texture_unit(0)
 {
 
 }
 
-ComputeShader::ComputeShader(const std::string file_path)
+ComputeShader::ComputeShader(const std::string file_path): texture_unit(0)
 {
 	LoadShader(file_path);
 }
@@ -152,6 +152,16 @@ void ComputeShader::setUniform(int i, GLuint tid)
 	glActiveTexture(GL_TEXTURE0 + i);
 	glBindTexture(GL_TEXTURE_2D, tid);
 	glUniform1i(A, i);
+}
+
+void ComputeShader::setUniform(std::string name, GLuint tid)
+{
+	glUseProgram(ProgramID);
+	GLuint A = glGetUniformLocation(ProgramID, name.c_str());
+	glActiveTexture(GL_TEXTURE0 + texture_unit);
+	glBindTexture(GL_TEXTURE_2D, tid);
+	glUniform1i(A, texture_unit);
+	texture_unit++;
 }
 
 void ComputeShader::setCameraObj(std::string name, gl_camera cam)

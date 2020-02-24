@@ -70,12 +70,21 @@ void WrapShaders(LuaVM* LVM)
 			return 1;
 		});
 
+	LUA.setfunction("setTexture32f", [](lua_State* L) -> int
+		{
+			ComputeShader* obj = (ComputeShader*)lua_touserdata(L, -3);
+			std::string name = std::string(lua_tostring(L, -2));
+			GLuint X = lua_tonumber(L, -1);
+			obj->setUniform(name, X);
+			return 1;
+		});
+
 	LUA.setfunction("setTexture", [](lua_State* L) -> int
 		{
 			ComputeShader* obj = (ComputeShader*)lua_touserdata(L, -3);
 			std::string name = std::string(lua_tostring(L, -2));
-			GLint X = lua_tonumber(L, -1);
-			obj->setUniform(name, X);
+			sf::Texture* X = (sf::Texture*)lua_touserdata(L, -1);
+			obj->setUniform(name, X->getNativeHandle());
 			return 1;
 		});
 

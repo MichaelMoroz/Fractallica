@@ -13,6 +13,7 @@
 #include <LuaVM.h>
 #include <InterfaceLua.h>
 #include <ShadersLua.h>
+#include <ResourcesLua.h>
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -67,6 +68,7 @@ int main(int argc, char *argv[]) {
 	
 	WrapInterface(&LUA);
 	WrapShaders(&LUA);
+	WrapResources(&LUA);
 
 	OpenMainMenu();
 	RunInitialScript();
