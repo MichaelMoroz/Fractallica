@@ -21,8 +21,7 @@
 #else
 #define ERROR_MSG(x) std::cerr << x << std::endl;
 #endif
-
-
+ 
 
 #if defined(_WIN32)
 int WinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR lpCmdLine, int nCmdShow) {
@@ -70,8 +69,8 @@ int main(int argc, char *argv[]) {
 	WrapInterface(&LUA);
 	WrapShaders(&LUA);
 	WrapResources(&LUA);
-	AddToGlobalLua("main_texture", &main_txt);
-	AddToGlobalLua("screenshot_texture", &screenshot_txt);
+	LUA.AddToGlobal("main_texture", &main_txt);
+	LUA.AddToGlobal("screenshot_texture", &screenshot_txt);
 
 	OpenMainMenu();
 	RunInitialScript();

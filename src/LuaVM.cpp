@@ -87,6 +87,21 @@ void LuaVM::setmetatable(std::string name, int stk_id)
 	lua_setmetatable(L, stk_id-1);
 }
 
+void * LuaVM::newuserdata(int size)
+{
+	return lua_newuserdata(L, size);
+}
+
+void LuaVM::newuserdatafrom(std::string name, void* data, std::string metatable)
+{
+	//assuming that Lua only stores the pointer as userdata
+	void** obj = (void**)lua_newuserdata(L, sizeof(void*));
+	*obj = data; //set the pointer to point at the data
+	luaL_getmetatable(L, metatable.c_str());
+	lua_setmetatable(L, -2);
+	lua_setglobal(L, name.c_str());
+}
+
 void LuaVM::pushfunction(std::string name, int(*fun)(lua_State * L))
 {
 	//push function pointer to stack
