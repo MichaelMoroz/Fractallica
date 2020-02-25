@@ -109,6 +109,19 @@ void LuaVM::setvalue(std::string name, int val_id)
 	lua_settable(L, -3);
 }
 
+void LuaVM::AddToGlobal(std::string name, void* var)
+{
+	lua_pushlightuserdata(L, var);
+	lua_setglobal(L, name.c_str());
+}
+
+void LuaVM::setlightuserdata(std::string name, void* var)
+{
+	lua_pushstring(L, name.c_str());
+	lua_pushlightuserdata(L, var);
+	lua_settable(L, -3);
+}
+
 LuaVM::~LuaVM()
 {
 	lua_close(L);

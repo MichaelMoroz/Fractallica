@@ -41,7 +41,7 @@ void WrapResources(LuaVM * LVM)
 
 
 	//HDR texture
-	int imgid = LUA.newtable("Texture32f");
+	int img32id = LUA.newtable("Texture32f");
 	LUA.setfunction("new", [](lua_State* L) -> int
 		{
 			int dX = lua_tonumber(L, -2);
@@ -70,6 +70,13 @@ void WrapResources(LuaVM * LVM)
 			return 0;
 		});
 	///the thing that links the metatable to the Object table
-	LUA.setvalue("__index", imgid);
+	LUA.setvalue("__index", img32id);
 
+}
+
+void AddToGlobalLua(std::string name, sf::Texture* txt)
+{
+	LUA.newtable(name);
+	LUA.setlightuserdata("__object", txt);
+	LUA.setmetatable("TextureMetaTable");
 }

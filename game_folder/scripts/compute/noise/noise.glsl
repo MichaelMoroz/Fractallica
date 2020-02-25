@@ -6,8 +6,8 @@
 layout(local_size_x = group_size, local_size_y = group_size) in;
 layout(rgba8, binding = 0) uniform image2D final_color; //final output texture 1 (used as final color)
 //global, always the last ones
-layout(rgba32f, binding = 1) uniform image2D DE_input; //global tex
-layout(rgba32f, binding = 2) uniform image2D color_HDR; //global tex
+//layout(rgba32f, binding = 1) uniform image2D DE_input; //global tex
+//layout(rgba32f, binding = 2) uniform image2D color_HDR; //global tex
 
 #define PI 3.14159265
 #include<utility/definitions.glsl>
@@ -16,7 +16,7 @@ layout(rgba32f, binding = 2) uniform image2D color_HDR; //global tex
 
 void main() {
 	ivec2 global_pos = ivec2(gl_GlobalInvocationID.xy);
-	vec2 img_size = vec2(imageSize(color_HDR));
+	vec2 img_size = vec2(imageSize(final_color));
 	
 	vec2 uv = vec2(global_pos)/img_size;
 	

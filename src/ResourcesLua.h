@@ -13,3 +13,4 @@
 #include <Gamemodes.h>
 
 void WrapResources(LuaVM* LVM);
+void AddToGlobalLua(std::string name, sf::Texture* txt);

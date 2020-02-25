@@ -152,11 +152,23 @@ void WrapShaders(LuaVM* LVM)
 	///the thing that links the metatable to the Object table
 	LUA.setvalue("__index", camid);
 
-	/*LUA.pushfunction("Bind32f", [](lua_State* L) -> int
+
+	//Bind images to the compute shader
+	LUA.pushfunction("Bind", [](lua_State* L) -> int
 		{
-			int id = lua_tonumber(L, -2);
-			GLint texid = lua_tonumber(L, -1);
-			glBindImageTexture(id, texid, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
+			int id = lua_tonumber(L, -3);
+			sf::Texture* X = (sf::Texture*)lua_touserdata(L, -2);
+			int RW = lua_tonumber(L, -1); //Read or write
+			glBindImageTexture(id, X->getNativeHandle(), 0, GL_FALSE, 0, RW, GL_RGBA8);
 			return 1;
-		});*/
+		});
+
+	LUA.pushfunction("Bind32f", [](lua_State* L) -> int
+		{
+			int id = lua_tonumber(L, -3);
+			GLint texid = lua_tonumber(L, -2);
+			int RW = lua_tonumber(L, -1);
+			glBindImageTexture(id, texid, 0, GL_FALSE, 0, RW, GL_RGBA32F);
+			return 1;
+		});
 }

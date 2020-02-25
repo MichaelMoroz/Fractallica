@@ -66,9 +66,12 @@ int main(int argc, char *argv[]) {
 	io_state.window_size = sf::Vector2f(window.getSize().x, window.getSize().y);
 	float prev_s = 0;
 	
+	//init LUA
 	WrapInterface(&LUA);
 	WrapShaders(&LUA);
 	WrapResources(&LUA);
+	AddToGlobalLua("main_texture", &main_txt);
+	AddToGlobalLua("screenshot_texture", &screenshot_txt);
 
 	OpenMainMenu();
 	RunInitialScript();
@@ -275,7 +278,12 @@ int main(int argc, char *argv[]) {
 			{
 				if (!(taken_screenshot && SETTINGS.stg.screenshot_preview))
 				{
-				
+					window.resetGLStates();
+					//Draw render texture to main window
+					sf::Sprite sprite(main_txt);
+					sprite.setScale(float(window.getSize().x) / float(rend.variables["width"]),
+						float(window.getSize().y) / float(rend.variables["height"]));
+					window.draw(sprite);
 				}
 				else
 				{
