@@ -69,8 +69,8 @@ int main(int argc, char *argv[]) {
 	WrapInterface(&LUA);
 	WrapShaders(&LUA);
 	WrapResources(&LUA);
-	LUA.AddToGlobal("main_texture", &main_txt);
-	LUA.AddToGlobal("screenshot_texture", &screenshot_txt);
+	AddGlobalTexture("main_texture", &main_txt);
+	AddGlobalTexture("screenshot_texture", &screenshot_txt);
 
 	OpenMainMenu();
 	RunInitialScript();

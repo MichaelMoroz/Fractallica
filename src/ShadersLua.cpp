@@ -83,7 +83,7 @@ void WrapShaders(LuaVM* LVM)
 		{
 			ComputeShader* obj = (ComputeShader*)lua_touserdata(L, -3);
 			std::string name = std::string(lua_tostring(L, -2));
-			sf::Texture* X = (sf::Texture*)lua_touserdata(L, -1);
+			sf::Texture* X = *(sf::Texture**)lua_touserdata(L, -1);
 			obj->setUniform(name, X->getNativeHandle());
 			return 1;
 		});
@@ -157,7 +157,7 @@ void WrapShaders(LuaVM* LVM)
 	LUA.pushfunction("Bind", [](lua_State* L) -> int
 		{
 			int id = lua_tonumber(L, -3);
-			sf::Texture* X = (sf::Texture*)lua_touserdata(L, -2);
+			sf::Texture* X = *(sf::Texture**)lua_touserdata(L, -2);
 			int RW = lua_tonumber(L, -1); //Read or write
 			glBindImageTexture(id, X->getNativeHandle(), 0, GL_FALSE, 0, RW, GL_RGBA8);
 			return 1;

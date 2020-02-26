@@ -21,3 +21,9 @@ camera:setPosition(10, 15, 30);
 shadertest = ComputeShader.new("scripts/compute/noise/noise.glsl");
 
 shadertest:setCameraObj("Camera1", camera);
+
+shadertest:setInt("iFrame", 0);
+
+Bind(0, main_texture, GL_READ_WRITE);
+
+shadertest:Run(1280,720);
