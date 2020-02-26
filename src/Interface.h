@@ -83,7 +83,9 @@ struct InputState
 	InputState(bool keys[sf::Keyboard::KeyCount], bool mouse[3], sf::Vector2f mouse_pos, sf::Vector2f mouse_speed);
 };
 
-typedef std::function<void(sf::RenderWindow * window, InputState & state)> call_func;
+class Object;
+
+typedef std::function<void(sf::RenderWindow * window, InputState & state, Object* obj)> call_func;
 
 //the object parameters
 struct State
@@ -151,6 +153,7 @@ public:
 	virtual void Draw(sf::RenderWindow * window, InputState& state);
 	virtual void AddObject(Object* a, Allign b);
 	virtual void AddReference(Object* a, Allign b);
+	virtual void SetData(void* data_ptr);
 	void Update(sf::RenderWindow * window, InputState& state);
 	void UpdateAction(sf::RenderWindow * window, InputState& state);
 	

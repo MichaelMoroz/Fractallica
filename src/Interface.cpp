@@ -412,7 +412,7 @@ bool Object::RunCallback(sf::RenderWindow * window, InputState & state)
 		//run through all of the callbacks
 		for (auto &this_callback : callback)
 		{
-			this_callback(window, state); //run callback with state info
+			this_callback(window, state, this); //run callback with state info
 		}
 		return true;
 	}
@@ -501,7 +501,7 @@ void Object::UpdateAction(sf::RenderWindow * window, InputState & state)
 		{
 			for (auto &this_callback : hoverfn)
 			{
-				this_callback(window, state); //run callback with state info
+				this_callback(window, state, this); //run callback with state info
 			}
 			curmode = ONHOVER;
 		}
@@ -516,7 +516,7 @@ void Object::UpdateAction(sf::RenderWindow * window, InputState & state)
 	{
 		for (auto &this_callback : callback)
 		{
-			this_callback(window, state); //run callback with state info
+			this_callback(window, state, this); //run callback with state info
 		}
 		curmode = ACTIVE;
 	}
@@ -527,7 +527,7 @@ void Object::UpdateAction(sf::RenderWindow * window, InputState & state)
 		{
 			for (auto &this_callback : defaultfn)
 			{
-				this_callback(window, state); //run callback with state info
+				this_callback(window, state, this); //run callback with state info
 			}
 		}
 	}
@@ -654,6 +654,14 @@ void Object::AddReference(Object* something, Allign a)
 	something->obj_allign = a;
 	objects.push_back(std::unique_ptr<Object>(something));
 	this->SetInsideSize(defaultstate.inside_size + something->defaultstate.size.y + something->defaultstate.margin);
+}
+
+/*
+	Sets arbitrary data to the object, usefull for child classes
+*/
+virtual void SetData(void* data_ptr)
+{
+
 }
 
 void Box::SetBackground(const sf::Texture & texture)
@@ -922,13 +930,13 @@ Window::Window(Window && A)
 void Window::CreateCallbacks()
 {
 	//use lambda funtion
-	this->objects[0].get()->objects[1].get()->SetMainCallbackFunction([parent = this](sf::RenderWindow * window, InputState & state)
+	this->objects[0].get()->objects[1].get()->SetMainCallbackFunction([parent = this](sf::RenderWindow * window, InputState & state, Object* obj)
 	{
 		Add2DeleteQueue(parent->id);
 	});
 
 	//delete callback
-	this->SetMainDefaultFunction([parent = this](sf::RenderWindow * window, InputState & state)
+	this->SetMainDefaultFunction([parent = this](sf::RenderWindow * window, InputState & state, Object* obj)
 	{
 		if (state.key_press[sf::Keyboard::Escape] == true)
 		{
@@ -938,7 +946,7 @@ void Window::CreateCallbacks()
 	});
 
 	//drag callback
-	this->objects[0].get()->SetMainCallbackFunction([parent = this](sf::RenderWindow * window, InputState & state)
+	this->objects[0].get()->SetMainCallbackFunction([parent = this](sf::RenderWindow * window, InputState & state, Object* obj)
 	{
 		parent->Move(state.mouse_speed);
 	}, false);
@@ -1100,7 +1108,7 @@ MenuBox::MenuBox(MenuBox && A): cursor_id(0)
 void MenuBox::CreateCallbacks()
 {
 	//use lambda funtion
-	this->objects[1].get()->objects[0].get()->SetMainCallbackFunction([parent = this](sf::RenderWindow * window, InputState & state)
+	this->objects[1].get()->objects[0].get()->SetMainCallbackFunction([parent = this](sf::RenderWindow * window, InputState & state, Object* this_obj)
 	{
 		float inside_size = parent->objects[0].get()->defaultstate.inside_size;
 		float height_1 = parent->objects[1].get()->defaultstate.size.y - 2 * parent->objects[1].get()->defaultstate.margin;
@@ -1111,7 +1119,7 @@ void MenuBox::CreateCallbacks()
 		parent->ScrollBy(state.mouse_speed.y*rel_coef);
 	}, false);
 
-	this->SetMainHoverFunction([parent = this](sf::RenderWindow * window, InputState & state)
+	this->SetMainHoverFunction([parent = this](sf::RenderWindow * window, InputState & state, Object* this_obj)
 	{
 		//wheel scroll 
 		if (state.wheel != 0.f)
@@ -1121,7 +1129,7 @@ void MenuBox::CreateCallbacks()
 		}
 	});
 
-	this->SetMainDefaultFunction([parent = this](sf::RenderWindow * window, InputState & state)
+	this->SetMainDefaultFunction([parent = this](sf::RenderWindow * window, InputState & state, Object* this_obj)
 	{
 		bool A = false;
 
@@ -1289,7 +1297,7 @@ void KeyMapper::operator=(KeyMapper && A)
 void KeyMapper::CreateCallbacks()
 {
 	//use a lambda function
-	this->objects[1].get()->SetMainCallbackFunction([parent = this](sf::RenderWindow * window, InputState & state)
+	this->objects[1].get()->SetMainCallbackFunction([parent = this](sf::RenderWindow * window, InputState & state, Object* this_obj)
 	{
 		parent->waiting = true;
 		//get the text pointer out of the object pointer inside the parent
@@ -1298,7 +1306,7 @@ void KeyMapper::CreateCallbacks()
 	});
 
 
-	this->SetMainDefaultFunction([parent = this](sf::RenderWindow * window, InputState & state)
+	this->SetMainDefaultFunction([parent = this](sf::RenderWindow * window, InputState & state, Object* this_obj)
 	{
 		if (parent->waiting)
 		{

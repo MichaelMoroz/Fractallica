@@ -89,7 +89,7 @@ void OpenMainMenu()
 	Text button6(LOCAL["Exit"], LOCAL("default"), 40, sf::Color::White);
 	button6.SetBorderColor(sf::Color::Black);
 	exitbtn.hoverstate.color_main = sf::Color(200, 40, 0, 255);
-	exitbtn.SetCallbackFunction([](sf::RenderWindow * window, InputState & state)
+	exitbtn.SetCallbackFunction([](sf::RenderWindow * window, InputState & state, Object* this_obj)
 	{
 		window->close();
 	}, true);
@@ -143,12 +143,12 @@ void ConfirmExit()
 
 	int id = AddGlobalObject(confirm);
 
-	get_glob_obj(id).objects[1].get()->objects[0].get()->objects[1].get()->SetCallbackFunction([id](sf::RenderWindow * window, InputState & state)
+	get_glob_obj(id).objects[1].get()->objects[0].get()->objects[1].get()->SetCallbackFunction([id](sf::RenderWindow * window, InputState & state, Object* this_obj)
 	{
 		window->close();
 	});
 
-	get_glob_obj(id).objects[1].get()->objects[0].get()->objects[2].get()->SetCallbackFunction([id](sf::RenderWindow * window, InputState & state)
+	get_glob_obj(id).objects[1].get()->objects[0].get()->objects[2].get()->SetCallbackFunction([id](sf::RenderWindow * window, InputState & state, Object* this_obj)
 	{
 		Add2DeleteQueue(id);
 	});
@@ -163,7 +163,7 @@ void DisplayError(std::string error_text)
 	error_window.Add(new Text(error_text, LOCAL("default"), 15, sf::Color::Red), Object::Allign::LEFT);
 
 	error_window.Add(new Button(LOCAL["Ok"], 240, 40,
-		[](sf::RenderWindow * window, InputState & state)
+		[](sf::RenderWindow * window, InputState & state, Object* this_obj)
 		{
 			
 		},
@@ -172,7 +172,7 @@ void DisplayError(std::string error_text)
 	int id = AddGlobalObject(error_window);
 
 	get_glob_obj(id).objects[1].get()->objects[0].get()->objects[1].get()->SetCallbackFunction(
-	[id](sf::RenderWindow * window, InputState & state)
+	[id](sf::RenderWindow * window, InputState & state, Object* this_obj)
 	{
 		Add2DeleteQueue(id);
 	});
@@ -186,7 +186,7 @@ void DisplayMessage(std::string text)
 	error_window.Add(new Text(text, LOCAL("default"), 15, sf::Color::White), Object::Allign::LEFT);
 
 	error_window.Add(new Button(LOCAL["Ok"], 240, 40,
-		[](sf::RenderWindow* window, InputState& state)
+		[](sf::RenderWindow* window, InputState& state, Object* this_obj)
 		{
 
 		},
@@ -195,7 +195,7 @@ void DisplayMessage(std::string text)
 	int id = AddGlobalObject(error_window);
 
 	get_glob_obj(id).objects[1].get()->objects[0].get()->objects[1].get()->SetCallbackFunction(
-		[id](sf::RenderWindow* window, InputState& state)
+		[id](sf::RenderWindow* window, InputState& state, Object* this_obj)
 		{
 			Add2DeleteQueue(id);
 		});
@@ -333,7 +333,7 @@ void ApplySettings(void *data)
 		settings.majorVersion = 4;
 		settings.minorVersion = 3;
 
-		window->create(screen_size, "Marble Marcher: Community Edition", window_style, settings);
+		window->create(screen_size, "Fractallica", window_style, settings);
 		window->setVerticalSyncEnabled(SETTINGS.stg.VSYNC);
 		window->setKeyRepeatEnabled(false);
 		
