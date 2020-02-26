@@ -92,13 +92,18 @@ void * LuaVM::newuserdata(int size)
 	return lua_newuserdata(L, size);
 }
 
-void LuaVM::newuserdatafrom(std::string name, void* data, std::string metatable)
+void LuaVM::newuserdatafrom(void* data, std::string metatable)
 {
 	//assuming that Lua only stores the pointer as userdata
 	void** obj = (void**)lua_newuserdata(L, sizeof(void*));
 	*obj = data; //set the pointer to point at the data
 	luaL_getmetatable(L, metatable.c_str());
 	lua_setmetatable(L, -2);
+}
+
+void LuaVM::newuserdatafrom(std::string name, void* data, std::string metatable)
+{
+	newuserdatafrom(data, metatable);
 	lua_setglobal(L, name.c_str());
 }
 

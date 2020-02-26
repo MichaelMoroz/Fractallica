@@ -317,6 +317,7 @@ public:
 	void operator=(Text&& A);
 
 	virtual Object* GetCopy();
+	virtual void SetData(void* data_ptr);
 };
 
 

@@ -596,6 +596,7 @@ void Object::copy(Object & A)
 	used_view = A.used_view;
 	obj_allign = A.obj_allign;
 
+	//copy callbacks
 	for (auto &a : A.callback) callback.push_back(a);
 	for (auto &a : A.hoverfn) hoverfn.push_back(a);
 	for (auto &a : A.defaultfn) defaultfn.push_back(a);
@@ -606,6 +607,7 @@ void Object::copy(Object & A)
 
 	action_time = A.action_time;
 
+	//copy elements inside the object too
 	for (auto &element : A.objects)
 		Object::AddObject(element.get(), element.get()->obj_allign);
 }
@@ -659,7 +661,7 @@ void Object::AddReference(Object* something, Allign a)
 /*
 	Sets arbitrary data to the object, useful for child classes
 */
-virtual void SetData(void* data_ptr)
+void Object::SetData(void* data_ptr)
 {
 
 }
@@ -905,6 +907,12 @@ void Text::operator=(Text && A)
 Object * Text::GetCopy()
 {
 	return static_cast<Object*>(new Text(*this));
+}
+
+void Text::SetData(void* data_ptr)
+{
+	//assuming the data is a string, otherwise ???
+	SetString(LOCAL[*(std::string*)data_ptr]);
 }
 
 void Window::Add(Object* something, Allign a)

@@ -17,3 +17,6 @@
 
 void WrapInterface(LuaVM* LVM);
 
+void AddObject2LuaStack(LuaVM* LVM, Object* obj);
+call_func GetLuaCallbackFunction(lua_State* L);
+

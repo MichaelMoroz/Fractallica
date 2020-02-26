@@ -6,7 +6,7 @@ void WrapResources(LuaVM * LVM)
 	LUA.setfunction("new", [](lua_State* L) -> int
 		{
 			sf::Texture** newobj = static_cast<sf::Texture**>(lua_newuserdata(L, sizeof(sf::Texture*)));
-			new (*newobj) sf::Texture();
+			*newobj = new sf::Texture();
 			luaL_getmetatable(L, "TextureMetaTable");
 			lua_setmetatable(L, -2);
 			return 1;
