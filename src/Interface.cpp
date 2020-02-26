@@ -657,7 +657,7 @@ void Object::AddReference(Object* something, Allign a)
 }
 
 /*
-	Sets arbitrary data to the object, usefull for child classes
+	Sets arbitrary data to the object, useful for child classes
 */
 virtual void SetData(void* data_ptr)
 {
