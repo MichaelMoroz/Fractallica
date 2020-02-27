@@ -5,6 +5,14 @@ GL_READ_ONLY = 0x88B8;
 GL_WRITE_ONLY = 0x88B9;
 GL_READ_WRITE = 0x88BA;
 
+interface_size = {x = 1920, y = 1080};
+
+Color = {
+		Black = vec4.new(0,0,0,1),
+		White = vec4.new(1,1,1,1),
+		Transparent = vec4.new(1,1,1,0)
+		};
+
 --SFML keys
 Key = {
         Unknown = -1, -- Unhandled key

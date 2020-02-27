@@ -30,6 +30,15 @@ void SetPointers(sf::RenderWindow *w, Renderer* rd, sf::Texture *main, sf::Textu
 	screenshot_txt = screensht;
 }
 
+void GameOpLua()
+{
+	LUA.pushfunction("CloseFractallica", [](lua_State* L) -> int
+		{
+			window->close();
+			return 1;
+		});
+}
+
 /*
 	The scripts that runs 1 time at the launch
 */

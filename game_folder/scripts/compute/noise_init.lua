@@ -1,0 +1,1 @@
+shader = ComputeShader.new("scripts/compute/noise/noise.glsl");

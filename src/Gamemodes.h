@@ -56,6 +56,7 @@ int DirExists(const char *path);
 
 
 void SetPointers(sf::RenderWindow * w, Renderer * rd, sf::Texture * main, sf::Texture * screensht);
+void GameOpLua();
 sf::Vector2i getResolution(int i);
 
 void TakeScreenshot();

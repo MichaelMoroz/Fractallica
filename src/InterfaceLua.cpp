@@ -25,6 +25,27 @@ void WrapInterface(LuaVM* LVM)
 			obj->SetPosition(posX, posY);
 			return 1;
 		});
+	LUA.setfunction("SetBorderColor", [](lua_State* L) -> int
+		{
+			Object* obj = *(Object**)lua_touserdata(L, -2);
+			vec4 color = **(vec4**)lua_touserdata(L, -1) * 255.f;
+			obj->SetBorderColor(sf::Color((int)color.x, (int)color.y, (int)color.z, (int)color.w));
+			return 1;
+		});
+	LUA.setfunction("SetBackgroundColor", [](lua_State* L) -> int
+		{
+			Object* obj = *(Object**)lua_touserdata(L, -2);
+			vec4 color = **(vec4**)lua_touserdata(L, -1) * 255.f;
+			obj->SetBackgroundColor(sf::Color((int)color.x, (int)color.y, (int)color.z, (int)color.w));
+			return 1;
+		});
+	LUA.setfunction("SetBorderWidth", [](lua_State* L) -> int
+		{
+			Object* obj = *(Object**)lua_touserdata(L, -2);
+			float w = lua_tonumber(L, -1);
+			obj->SetBorderWidth(w);
+			return 1;
+		});
 	LUA.setfunction("AddObject", [](lua_State* L) -> int
 		{
 			Object* obj = *(Object**)lua_touserdata(L, -3);
@@ -52,6 +73,12 @@ void WrapInterface(LuaVM* LVM)
 			Object* obj = *(Object**)lua_touserdata(L, -2);
 			call_func c = GetLuaCallbackFunction(L);
 			obj->SetHoverFunction(c);
+			return 1;
+		});
+	LUA.setfunction("SetStatic", [](lua_State* L) -> int
+		{
+			Object* obj = *(Object**)lua_touserdata(L, -1);
+			obj->static_object = !obj->static_object;
 			return 1;
 		});
 	LUA.setfunction("SetText", [](lua_State* L) -> int
@@ -129,6 +156,39 @@ void WrapInterface(LuaVM* LVM)
 		});
 	LUA.setvalue("__index", mboxid);
 
+	/*
+		Button child class wrapper
+	*/
+
+	int buttonid = LUA.newtable("Button");
+	LUA.setfunction("new", [](lua_State* L) -> int
+		{
+			std::string text = lua_tostring(L, -4);
+			float dX = lua_tonumber(L, -3);
+			float dY = lua_tonumber(L, -2);
+			call_func c = GetLuaCallbackFunction(L);
+			void** newobj = (void**)lua_newuserdata(L, sizeof(void*));
+			*newobj = new Button(text, dX, dY, c);
+			luaL_getmetatable(L, "ButtonMetaTable");
+			lua_setmetatable(L, -2);
+			return 1;
+		});
+	//inheritance of Box methods
+	LUA.setmetatable("BoxMetaTable");
+
+	LUA.newmetatable("ButtonMetaTable");
+	///object destructor
+	LUA.setfunction("__gc", [](lua_State* L) -> int
+		{
+			Button* obj = *(Button**)lua_touserdata(L, -1);
+			obj->~Button();
+			return 0;
+		});
+	LUA.setvalue("__index", buttonid);
+
+	/*
+		Text class wrapper
+	*/
 	int textid = LUA.newtable("Text");
 	LUA.setfunction("new", [](lua_State* L) -> int
 		{
@@ -160,6 +220,12 @@ void WrapInterface(LuaVM* LVM)
 		{
 			Object* obj = *(Object**)lua_touserdata(L, -1);
 			AddGlobalObject(*obj);
+			return 1;
+		});
+
+	LUA.pushfunction("RemoveAllObjects", [](lua_State* L) -> int
+		{
+			RemoveAllObjects();
 			return 1;
 		});
 

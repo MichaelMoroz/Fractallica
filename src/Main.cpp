@@ -69,10 +69,10 @@ int main(int argc, char *argv[]) {
 	WrapInterface(&LUA);
 	WrapShaders(&LUA);
 	WrapResources(&LUA);
+	GameOpLua();
 	AddGlobalTexture("main_texture", &main_txt);
 	AddGlobalTexture("screenshot_texture", &screenshot_txt);
 
-	OpenMainMenu();
 	RunInitialScript();
 
 	#define n_touch 5

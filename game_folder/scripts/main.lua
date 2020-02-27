@@ -5,34 +5,15 @@
 --Load the table saving library
 dofile( "scripts/libs/table.save-1.0.lua" )
 dofile( "scripts/libs/definitions.lua" )
-
-box = Box.new(250,600);
-
-box:SetPosition(300,500);
-
-iterator = 0;
-
-function weird_callback(object)
-	iterator = iterator + 1;
-	object:SetText(tostring(iterator));
-end;
-
-weird_text = Text.new("inirgwff", 50);
-weird_text:SetCallbackFunction(weird_callback);
-box:AddObject(weird_text, Allign.LEFT);
-
-AddGlobalObject(box);
+dofile( "scripts/menus/main_menu.lua" );
 
 camera = Camera.new();
 
 camera:setPosition(10, 15, 30);
 
---[[shadertest = ComputeShader.new("scripts/compute/noise/noise.glsl");
+frame = 0;
 
-shadertest:setCameraObj("Camera1", camera);
+OpenMainMenu();
 
-shadertest:setInt("iFrame", 0);
-
-Bind(0, main_texture, GL_READ_WRITE);
-
-shadertest:Run(1280,720);--]]
+--intialize the shader
+dofile( "scripts/compute/noise_init.lua" );
