@@ -14,3 +14,6 @@
 
 void WrapResources(LuaVM* LVM);
 void AddGlobalTexture(std::string name, sf::Texture* txt);
+void PushVector(vec2 a);
+void PushVector(vec3 a);
+void PushVector(vec4 a);
