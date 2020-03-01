@@ -348,9 +348,10 @@ void Object::Move(sf::Vector2f dx)
 	}
 }
 
-void Object::SetDefaultFunction(call_func fun)
+void Object::SetDefaultFunction(call_func fun, bool is_global)
 {
 	defaultfn.push_back(fun);
+	defaultglobal.push_back(is_global);
 }
 
 void Object::SetCallbackFunction(call_func fun, bool limit_repeat)
@@ -364,12 +365,19 @@ void Object::SetHoverFunction(call_func fun)
 	hoverfn.push_back(fun);
 }
 
-void Object::SetMainDefaultFunction(call_func fun)
+void Object::SetMainDefaultFunction(call_func fun, bool is_global)
 {
 	if (defaultfn.size() == 0)
+	{
 		defaultfn.push_back(fun);
+		defaultglobal.push_back(is_global);
+	}
 	else
+	{
 		defaultfn[0] = fun;
+		defaultglobal[0] = is_global;
+	}
+		
 }
 
 void Object::SetMainCallbackFunction(call_func fun, bool limit_repeat)
@@ -393,6 +401,7 @@ void Object::SetMainHoverFunction(call_func fun)
 void Object::ClearDefaultFunctions()
 {
 	defaultfn.clear();
+	defaultglobal.clear();
 }
 
 void Object::ClearCallbackFunctions()
@@ -523,11 +532,11 @@ void Object::UpdateAction(sf::RenderWindow * window, InputState & state)
 
 	if (action_time <= 0.f) //limit the repetability
 	{
-		if (focused == id) //if this object is the one that is currently in focus
+		for (int i = 0; i < defaultfn.size(); i++)
 		{
-			for (auto &this_callback : defaultfn)
+			if ((focused == id && !defaultglobal[i]) || defaultglobal[i]) //if this object is the one that is currently in focus
 			{
-				this_callback(window, state, this); //run callback with state info
+				defaultfn[i](window, state, this); //run callback with state info
 			}
 		}
 	}
@@ -600,6 +609,7 @@ void Object::copy(Object & A)
 	for (auto &a : A.callback) callback.push_back(a);
 	for (auto &a : A.hoverfn) hoverfn.push_back(a);
 	for (auto &a : A.defaultfn) defaultfn.push_back(a);
+	for (auto& a : A.defaultglobal) defaultglobal.push_back(a);
 
 	id = all_obj_id;
 	all_obj_id++;

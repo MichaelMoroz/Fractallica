@@ -56,9 +56,10 @@ void WrapInterface(LuaVM* LVM)
 		});
 	LUA.setfunction("SetDefaultFunction", [](lua_State* L) -> int
 		{
-			Object* obj = *(Object**)lua_touserdata(L, -2);
+			Object* obj = *(Object**)lua_touserdata(L, -3);
+			bool b = lua_toboolean(L, -2);
 			call_func c = GetLuaCallbackFunction(L);
-			obj->SetDefaultFunction(c);
+			obj->SetDefaultFunction(c, b);
 			return 1;
 		});
 	LUA.setfunction("SetCallbackFunction", [](lua_State* L) -> int
@@ -99,6 +100,18 @@ void WrapInterface(LuaVM* LVM)
 			return 0;
 		});
 	
+	///the thing that links the metatable to the Object table
+	LUA.setvalue("__index", objid);
+
+	//metatable for the object pointer, with the destructor overwritten 
+	LUA.newmetatable("ObjectPtr");
+	///object destructor
+	LUA.setfunction("__gc", [](lua_State* L) -> int
+		{
+			//do nothing
+			return 0;
+		});
+
 	///the thing that links the metatable to the Object table
 	LUA.setvalue("__index", objid);
 
@@ -187,6 +200,66 @@ void WrapInterface(LuaVM* LVM)
 	LUA.setvalue("__index", buttonid);
 
 	/*
+		Window child class wrapper
+	*/
+	//float x, float y, float dx, float dy,
+	int windowid = LUA.newtable("Window");
+	LUA.setfunction("new", [](lua_State* L) -> int
+		{
+			float X = lua_tonumber(L, -5);
+			float Y = lua_tonumber(L, -4);
+			float dX = lua_tonumber(L, -3);
+			float dY = lua_tonumber(L, -2);
+			std::string text = lua_tostring(L, -1);
+			void** newobj = (void**)lua_newuserdata(L, sizeof(void*));
+			*newobj = new Window(X, Y, dX, dY, default_main_color, LOCAL[text]);
+			luaL_getmetatable(L, "WindowMetaTable");
+			lua_setmetatable(L, -2);
+			return 1;
+		});
+	//inheritance of Box methods
+	LUA.setmetatable("BoxMetaTable");
+
+	LUA.newmetatable("WindowMetaTable");
+	///object destructor
+	LUA.setfunction("__gc", [](lua_State* L) -> int
+		{
+			Window* obj = *(Window**)lua_touserdata(L, -1);
+			obj->~Window();
+			return 0;
+		});
+	LUA.setvalue("__index", windowid);
+
+	/*
+		Window child class wrapper
+	*/
+	//float x, float y, float dx, float dy,
+	int imgid = LUA.newtable("ImageBox");
+	LUA.setfunction("new", [](lua_State* L) -> int
+		{
+			sf::Texture *X = *(sf::Texture**)lua_touserdata(L, -3);
+			float dX = lua_tonumber(L, -2);
+			float dY = lua_tonumber(L, -1);
+			void** newobj = (void**)lua_newuserdata(L, sizeof(void*));
+			*newobj = new Image(*X, dX, dY, sf::Color::White);
+			luaL_getmetatable(L, "ImageBoxMetaTable");
+			lua_setmetatable(L, -2);
+			return 1;
+		});
+	//inheritance of Box methods
+	LUA.setmetatable("BoxMetaTable");
+
+	LUA.newmetatable("ImageBoxMetaTable");
+	///object destructor
+	LUA.setfunction("__gc", [](lua_State* L) -> int
+		{
+			Image* obj = *(Image**)lua_touserdata(L, -1);
+			obj->~Image();
+			return 0;
+		});
+	LUA.setvalue("__index", imgid);
+
+	/*
 		Text class wrapper
 	*/
 	int textid = LUA.newtable("Text");
@@ -267,7 +340,7 @@ call_func GetLuaCallbackFunction(lua_State* L)
 		//assuming that Lua only stores the pointer as userdata
 		void** dt = (void**)lua_newuserdata(L, sizeof(void*));
 		*dt = obj; //set the pointer to point at the data
-		luaL_getmetatable(L, "ObjectMetaTable");
+		luaL_getmetatable(L, "ObjectPtr");
 		lua_setmetatable(L, -2);
 		/* do the call (1 arguments, 0 results) */
 		if (lua_pcall(L, 1, 0, 0) != 0)

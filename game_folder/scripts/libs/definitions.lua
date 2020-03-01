@@ -10,6 +10,10 @@ interface_size = {x = 1920, y = 1080};
 Color = {
 		Black = vec4.new(0,0,0,1),
 		White = vec4.new(1,1,1,1),
+		Red = vec4.new(1,0,0,1),
+		Green = vec4.new(0,1,0,1),
+		Blue = vec4.new(0,0,1,1),
+		Gray = vec4.new(0.5,0.5,0.5, 1),
 		Transparent = vec4.new(1,1,1,0)
 		};
 

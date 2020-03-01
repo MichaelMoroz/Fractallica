@@ -39,6 +39,17 @@ void WrapResources(LuaVM * LVM)
 	///the thing that links the metatable to the Object table
 	LUA.setvalue("__index", imgid);
 
+	LUA.newmetatable("TexturePtr");
+	///object destructor
+	LUA.setfunction("__gc", [](lua_State* L) -> int
+		{
+			//nothing
+			return 0;
+		});
+
+	///the thing that links the metatable to the Object table
+	LUA.setvalue("__index", imgid);
+
 
 	//HDR texture
 	int img32id = LUA.newtable("Texture32f");
@@ -319,7 +330,7 @@ void WrapResources(LuaVM * LVM)
 
 void AddGlobalTexture(std::string name, sf::Texture* txt)
 {
-	LUA.newuserdatafrom(name, txt, "TextureMetaTable");
+	LUA.newuserdatafrom(name, txt, "TexturePtr");
 }
 
 void PushVector(vec2 a)

@@ -135,11 +135,11 @@ public:
 	void SetScroll(float x);
 	void Move(sf::Vector2f dx);
 
-	void SetDefaultFunction(call_func fun);
+	void SetDefaultFunction(call_func fun, bool is_global = false);
 	void SetCallbackFunction(call_func fun, bool limit_repeat = true);
 	void SetHoverFunction(call_func fun);
-	
-	void SetMainDefaultFunction(call_func fun);
+
+	void SetMainDefaultFunction(call_func fun, bool is_global = false);
 	void SetMainCallbackFunction(call_func fun, bool limit_repeat = true);
 	void SetMainHoverFunction(call_func fun);
 
@@ -183,6 +183,7 @@ public:
 	
 	//multiple callbacks
 	std::vector<call_func> callback, hoverfn, defaultfn;
+	std::vector<bool> defaultglobal;
 
 	//objects inside this object
 	std::vector<std::unique_ptr<Object>> objects;
