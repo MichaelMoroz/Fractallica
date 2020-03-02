@@ -326,7 +326,7 @@ void WrapInterface(LuaVM* LVM)
 
 void AddObject2LuaStack(LuaVM* LVM, Object* obj)
 {
-	LVM->newuserdatafrom(obj, "ObjectMetaTable");
+	LVM->newuserdatafrom(obj, "ObjectPtr");
 }
 
 call_func GetLuaCallbackFunction(lua_State* L)
@@ -335,7 +335,7 @@ call_func GetLuaCallbackFunction(lua_State* L)
 	return [L, function_id](sf::RenderWindow* window, InputState& state, Object* obj)
 	{
 		//push function onto stack
-		lua_rawgeti(L, LUA_REGISTRYINDEX, function_id); 
+		lua_rawgeti(L, LUA_REGISTRYINDEX, function_id); //rawgeti spaghetti
 		//push object onto stack
 		//assuming that Lua only stores the pointer as userdata
 		void** dt = (void**)lua_newuserdata(L, sizeof(void*));
