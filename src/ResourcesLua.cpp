@@ -26,6 +26,13 @@ void WrapResources(LuaVM * LVM)
 			obj->loadFromFile(fname);
 			return 1;
 		});
+	LUA.setfunction("saveToFile", [](lua_State* L) -> int
+		{
+			sf::Texture* obj = *(sf::Texture**)lua_touserdata(L, -2);
+			std::string fname = lua_tostring(L, -1);
+			obj->copyToImage().saveToFile(fname);
+			return 1;
+		});
 
 	LUA.newmetatable("TextureMetaTable");
 	///object destructor
@@ -55,12 +62,12 @@ void WrapResources(LuaVM * LVM)
 	int img32id = LUA.newtable("Texture32f");
 	LUA.setfunction("new", [](lua_State* L) -> int
 		{
-			int dX = lua_tonumber(L, -2);
-			int dY = lua_tonumber(L, -1);
-			void* obj = lua_newuserdata(L, sizeof(GLuint));
-			GLuint *texture = static_cast<GLuint*>(obj);
-			glGenTextures(1, texture);
-			glBindTexture(GL_TEXTURE_2D, *texture);
+			int dX = ceil(lua_tonumber(L, -2));
+			int dY = ceil(lua_tonumber(L, -1));
+			GLuint* obj = (GLuint*)lua_newuserdata(L, sizeof(GLuint));
+			new (obj) GLuint();
+			glGenTextures(1, obj);
+			glBindTexture(GL_TEXTURE_2D, *obj);
 			//HDR texture
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, dX, dY, 0, GL_RGBA, GL_FLOAT, NULL);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

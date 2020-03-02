@@ -676,6 +676,15 @@ void Object::SetData(void* data_ptr)
 
 }
 
+/*
+	Sets arbitrary data from the object
+*/
+void* Object::GetData()
+{
+	return nullptr;
+}
+
+
 void Box::SetBackground(const sf::Texture & texture)
 {
 	image = texture;

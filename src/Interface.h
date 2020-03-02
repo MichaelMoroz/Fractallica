@@ -154,6 +154,8 @@ public:
 	virtual void AddObject(Object* a, Allign b);
 	virtual void AddReference(Object* a, Allign b);
 	virtual void SetData(void* data_ptr);
+	virtual void* GetData();
+
 	void Update(sf::RenderWindow * window, InputState& state);
 	void UpdateAction(sf::RenderWindow * window, InputState& state);
 	

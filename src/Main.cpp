@@ -251,6 +251,8 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
+		RunLoopScript();
+
 		//touch circles
 		int touches = 0;
 		for (int i = 0; i < n_touch; i++)
@@ -277,11 +279,12 @@ int main(int argc, char *argv[]) {
 			{
 				if (!(taken_screenshot && SETTINGS.stg.screenshot_preview))
 				{
+					RunRenderScript();
 					window.resetGLStates();
 					//Draw render texture to main window
 					sf::Sprite sprite(main_txt);
-					sprite.setScale(float(window.getSize().x) / float(rend.variables["width"]),
-						float(window.getSize().y) / float(rend.variables["height"]));
+					sprite.setScale(float(window.getSize().x) / float(main_txt.getSize().x),
+						float(window.getSize().y) / float(main_txt.getSize().y));
 					window.draw(sprite);
 				}
 				else
@@ -304,7 +307,7 @@ int main(int argc, char *argv[]) {
 				}
 			}
 		}
-	 
+
 		//new interface render stuff
 		io_state.dt = prev_s;
 		io_state.time += io_state.dt;

@@ -16,8 +16,8 @@ void WrapShaders(LuaVM* LVM)
 	LUA.setfunction("Run", [](lua_State* L) -> int
 		{
 			ComputeShader* obj = (ComputeShader*)lua_touserdata(L, -3);
-			int nx = lua_tonumber(L, -2);
-			int ny = lua_tonumber(L, -1);
+			float nx = ceil(lua_tonumber(L, -2));
+			float ny = ceil(lua_tonumber(L, -1));
 			obj->Run(vec2(nx, ny));
 			return 1;
 		});
@@ -61,6 +61,15 @@ void WrapShaders(LuaVM* LVM)
 			return 1;
 		});
 
+	LUA.setfunction("setBool", [](lua_State* L) -> int
+		{
+			ComputeShader* obj = (ComputeShader*)lua_touserdata(L, -3);
+			std::string name = std::string(lua_tostring(L, -2));
+			bool nx = lua_toboolean(L, -1);
+			obj->setUniform(name, nx);
+			return 1;
+		});
+
 	LUA.setfunction("setCameraObj", [](lua_State* L) -> int
 		{
 			ComputeShader* obj = (ComputeShader*)lua_touserdata(L, -3);
@@ -74,7 +83,7 @@ void WrapShaders(LuaVM* LVM)
 		{
 			ComputeShader* obj = (ComputeShader*)lua_touserdata(L, -3);
 			std::string name = std::string(lua_tostring(L, -2));
-			GLuint X = lua_tonumber(L, -1);
+			GLuint X = *(GLuint*)lua_touserdata(L, -1);
 			obj->setUniform(name, X);
 			return 1;
 		});
@@ -140,6 +149,48 @@ void WrapShaders(LuaVM* LVM)
 			return 1;
 		});
 
+	LUA.setfunction("Move", [](lua_State* L) -> int
+		{
+			Camera* obj = (Camera*)lua_touserdata(L, -4);
+			float dx = lua_tonumber(L, -3);
+			float dy = lua_tonumber(L, -1);
+			float dz = lua_tonumber(L, -2);
+			obj->Move(vec3(dx, dy, dz));
+			return 1;
+		});
+
+	LUA.setfunction("RotateX", [](lua_State* L) -> int
+		{
+			Camera* obj = (Camera*)lua_touserdata(L, -2);
+			float dx = lua_tonumber(L, -1);
+			obj->RotateX(dx);
+			return 1;
+		});
+
+	LUA.setfunction("RotateY", [](lua_State* L) -> int
+		{
+			Camera* obj = (Camera*)lua_touserdata(L, -2);
+			float dx = lua_tonumber(L, -1);
+			obj->RotateY(dx);
+			return 1;
+		});
+
+	LUA.setfunction("Roll", [](lua_State* L) -> int
+		{
+			Camera* obj = (Camera*)lua_touserdata(L, -2);
+			float dx = lua_tonumber(L, -1);
+			obj->Roll(dx);
+			return 1;
+		});
+
+	LUA.setfunction("SetExposure", [](lua_State* L) -> int
+		{
+			Camera* obj = (Camera*)lua_touserdata(L, -2);
+			float exposure = lua_tonumber(L, -1);
+			obj->SetExposure(exposure);
+			return 1;
+		});
+
 	LUA.newmetatable("CameraMetaTable");
 	///object destructor
 	LUA.setfunction("__gc", [](lua_State* L) -> int
@@ -166,7 +217,7 @@ void WrapShaders(LuaVM* LVM)
 	LUA.pushfunction("Bind32f", [](lua_State* L) -> int
 		{
 			int id = lua_tonumber(L, -3);
-			GLint texid = lua_tonumber(L, -2);
+			GLint texid = *(GLuint*)lua_touserdata(L, -2);
 			int RW = lua_tonumber(L, -1);
 			glBindImageTexture(id, texid, 0, GL_FALSE, 0, RW, GL_RGBA32F);
 			return 1;

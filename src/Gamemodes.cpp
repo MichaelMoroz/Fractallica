@@ -30,15 +30,6 @@ void SetPointers(sf::RenderWindow *w, Renderer* rd, sf::Texture *main, sf::Textu
 	screenshot_txt = screensht;
 }
 
-void GameOpLua()
-{
-	LUA.pushfunction("CloseFractallica", [](lua_State* L) -> int
-		{
-			window->close();
-			return 1;
-		});
-}
-
 /*
 	The scripts that runs 1 time at the launch
 */
@@ -60,53 +51,6 @@ void RunLoopScript()
 void RunRenderScript()
 {
 	LUA.DoFile(render_lua);
-}
-
-void OpenMainMenu()
-{
-	RemoveAllObjects();
-	game_mode = MAIN_MENU;
-
-	sf::Vector2f wsize = default_size;
-	sf::Vector2f vsize = default_view.getSize();
-	MenuBox mainmenu(1000, vsize.y*0.95f, false, wsize.x*0.025, wsize.y*0.025f);
-	mainmenu.SetBackgroundColor(sf::Color::Transparent);
-	//make the menu static
-	mainmenu.static_object = true;
-
-	//TITLE
-	Text ttl("Fractallica", LOCAL("default"), 120, sf::Color::White);
-	ttl.SetBorderColor(sf::Color::Black);
-	ttl.SetBorderWidth(4);
-	mainmenu.AddObject(&ttl, Object::Allign::LEFT);
-
-	Box margin1(800, 5);
-	margin1.SetBackgroundColor(sf::Color::Transparent);
-	mainmenu.AddObject(&margin1, Object::Allign::LEFT);
-
-	Text CE("Alpha " + std::string(PROJECT_VER), LOCAL("default"), 60, sf::Color::White);
-	CE.SetBorderColor(sf::Color::Black);
-	CE.SetBorderWidth(4);
-	mainmenu.AddObject(&CE, Object::Allign::LEFT);
-
-	Box margin(800, 80);
-	margin.SetBackgroundColor(sf::Color::Transparent);
-	mainmenu.AddObject(&margin, Object::Allign::LEFT);
-
-	//Exit
-	Box exitbtn(600, 50);
-	Text button6(LOCAL["Exit"], LOCAL("default"), 40, sf::Color::White);
-	button6.SetBorderColor(sf::Color::Black);
-	exitbtn.hoverstate.color_main = sf::Color(200, 40, 0, 255);
-	exitbtn.SetCallbackFunction([](sf::RenderWindow * window, InputState & state, Object* this_obj)
-	{
-		window->close();
-	}, true);
-	exitbtn.AddObject(&button6, Object::Allign::CENTER);
-	mainmenu.AddObject(&exitbtn, Object::Allign::LEFT);
-	
-
-	AddGlobalObject(mainmenu);
 }
 
 void OpenTestWindow()
@@ -262,7 +206,6 @@ sf::Vector2i getResolution(int i)
 	}
 }
 
-
 void TakeScreenshot()
 {
 	taken_screenshot = true;
@@ -318,6 +261,44 @@ void InitializeRendering(std::string config)
 }
 
 
+void InitializeWindow(bool fullscreen, float FPSlimit)
+{
+	if (!window->isOpen() || fullscreen != fullscreen_current)
+	{
+		fullscreen_current = fullscreen;
+
+		sf::VideoMode screen_size;
+		sf::Uint32 window_style;
+		if (fullscreen) {
+			screen_size = sf::VideoMode::getDesktopMode();
+			window_style = sf::Style::Fullscreen;
+		}
+		else {
+			screen_size = sf::VideoMode::getDesktopMode();
+			window_style = sf::Style::Default;
+		}
+
+		//GL settings
+		sf::ContextSettings settings;
+		settings.majorVersion = 4;
+		settings.minorVersion = 3;
+
+		window->create(screen_size, "Fractallica", window_style, settings);
+		window->setVerticalSyncEnabled(SETTINGS.stg.VSYNC);
+		window->setKeyRepeatEnabled(false);
+
+		INIT();
+
+		if (!fullscreen)
+		{
+			sf::VideoMode fs_size = sf::VideoMode::getDesktopMode();
+			window->setSize(sf::Vector2u(fs_size.width, fs_size.height - 100.f));
+			window->setPosition(sf::Vector2i(0, 0));
+		}
+	}
+	window->setFramerateLimit(FPSlimit);
+}
+
 void ApplySettings(void *data)
 {
 	//if window is not yet created or when the fullscreen setting is changed
@@ -345,7 +326,7 @@ void ApplySettings(void *data)
 		window->create(screen_size, "Fractallica", window_style, settings);
 		window->setVerticalSyncEnabled(SETTINGS.stg.VSYNC);
 		window->setKeyRepeatEnabled(false);
-		
+
 		INIT();
 
 		if (!fullscreen)
@@ -365,6 +346,54 @@ void ApplySettings(void *data)
 	std::vector<std::string> configs = renderer_ptr->GetConfigurationsList();
 
 	InitializeRendering(configs[SETTINGS.stg.shader_config]);
+}
+
+//global Lua functions
+void GameOpLua()
+{
+	LUA.pushfunction("CloseFractallica", [](lua_State* L) -> int
+		{
+			window->close();
+			return 1;
+		});
+	
+	LUA.pushfunction("InitializeWindow", [](lua_State* L) -> int
+		{
+			bool fullscreen = lua_toboolean(L, -2);
+			float FPSlim = lua_tonumber(L, -1);
+			InitializeWindow(fullscreen, FPSlim);
+			return 1;
+		});
+
+	LUA.pushfunction("InitializeRenderTextures", [](lua_State* L) -> int
+		{
+			float W = lua_tonumber(L, -4);
+			float H = lua_tonumber(L, -3);
+			float Ws = lua_tonumber(L, -2);
+			float Hs = lua_tonumber(L, -1);
+			main_txt->create(W, H);
+			screenshot_txt->create(Ws, Hs);
+			return 1;
+		});
+
+	LUA.pushfunction("GetLanguages", [](lua_State* L) -> int
+		{
+			std::vector<std::string> langs = LOCAL.GetLanguages();
+			int langnum = langs.size(); /* set this dynamically */
+			lua_createtable(L, langnum, 0);
+			for (int i = 0; i < langnum; i++) {
+				lua_pushstring(L, langs[i].c_str());
+				lua_rawseti(L, -2, i + 1); /* In lua indices start at 1 */
+			}
+			return 1;
+		});
+
+	LUA.pushfunction("SetLanguage", [](lua_State* L) -> int
+		{
+			std::string lang = lua_tostring(L, -1);
+			LOCAL.SetLanguage(lang);
+			return 1;
+		});
 }
 
 void RestoreSettings(void* data)
