@@ -17,15 +17,13 @@ float target_fps = 60.0f;
 
 GameMode game_mode = MAIN_MENU;
 
-Renderer *renderer_ptr;
 sf::RenderWindow *window;
 sf::Texture *main_txt;
 sf::Texture *screenshot_txt;
 
-void SetPointers(sf::RenderWindow *w, Renderer* rd, sf::Texture *main, sf::Texture *screensht)
+void SetPointers(sf::RenderWindow *w,  sf::Texture *main, sf::Texture *screensht)
 {
-	window = w;
-	renderer_ptr = rd;
+	window = w;	
 	main_txt = main;
 	screenshot_txt = screensht;
 }
@@ -206,60 +204,6 @@ sf::Vector2i getResolution(int i)
 	}
 }
 
-void TakeScreenshot()
-{
-	taken_screenshot = true;
-	sf::Vector2i rendering_resolution = getResolution(SETTINGS.stg.rendering_resolution);
-	sf::Vector2i screenshot_resolution = getResolution(SETTINGS.stg.screenshot_resolution);
-
-	renderer_ptr->ReInitialize(screenshot_resolution.x, screenshot_resolution.y);
-	renderer_ptr->SetOutputTexture(*screenshot_txt);
-
-	renderer_ptr->camera.SetMotionBlur(0);
-	
-	//a few rendering steps to converge the TXAA
-	for(int i = 0; i < SETTINGS.stg.screenshot_samples; i++) 	renderer_ptr->Render();
-	window -> resetGLStates();
-	screenshot_txt->copyToImage().saveToFile((std::string)"screenshots/screenshot" + (std::string)num2str(time(NULL)) + ".jpg");
-
-	renderer_ptr->ReInitialize(rendering_resolution.x, rendering_resolution.y);
-	renderer_ptr->SetOutputTexture(*main_txt);
-	screenshot_clock.restart();
-}
-
-
-void UpdateUniforms()
-{
-	renderer_ptr->camera.bloomintensity = SETTINGS.stg.bloom_intensity;
-	renderer_ptr->camera.bloomradius = SETTINGS.stg.bloom_radius;
-	renderer_ptr->camera.auto_exposure_speed = SETTINGS.stg.auto_exposure_speed;
-	renderer_ptr->camera.auto_exposure_target = SETTINGS.stg.auto_exposure_target;
-	renderer_ptr->camera.SetMotionBlur(SETTINGS.stg.motion_blur);
-	renderer_ptr->camera.SetFOV(SETTINGS.stg.FOV);
-	renderer_ptr->camera.cross_eye = SETTINGS.stg.cross_eye;
-	renderer_ptr->camera.eye_separation = SETTINGS.stg.eye_separation;
-	renderer_ptr->camera.SetBokehRadius(SETTINGS.stg.DOF_max);
-}
-
-void InitializeRendering(std::string config)
-{
-	sf::Vector2i rendering_resolution = getResolution(SETTINGS.stg.rendering_resolution);
-	sf::Vector2i screenshot_resolution = getResolution(SETTINGS.stg.screenshot_resolution);
-
-	renderer_ptr->variables["MRRM_scale"] = SETTINGS.stg.MRRM_scale;
-	renderer_ptr->variables["shadow_scale"] = SETTINGS.stg.shadow_resolution;
-	renderer_ptr->variables["bloom_scale"] = SETTINGS.stg.bloom_resolution;
-	renderer_ptr->Initialize(rendering_resolution.x, rendering_resolution.y, renderer_ptr->GetConfigFolder() + "/" + config);
-	
-	UpdateUniforms();
-	renderer_ptr->camera.SetFocus(SETTINGS.stg.DOF_focus);
-	renderer_ptr->camera.SetExposure(SETTINGS.stg.exposure);
-	
-	main_txt->create(rendering_resolution.x, rendering_resolution.y);
-	renderer_ptr->SetOutputTexture(*main_txt);
-	screenshot_txt->create(screenshot_resolution.x, screenshot_resolution.y);
-}
-
 
 void InitializeWindow(bool fullscreen, float FPSlimit)
 {
@@ -342,10 +286,6 @@ void ApplySettings(void *data)
 	window->setFramerateLimit(SETTINGS.stg.fps_limit);
 	std::vector<std::string> langs = LOCAL.GetLanguages();
 	LOCAL.SetLanguage(langs[SETTINGS.stg.language]);
-
-	std::vector<std::string> configs = renderer_ptr->GetConfigurationsList();
-
-	InitializeRendering(configs[SETTINGS.stg.shader_config]);
 }
 
 //global Lua functions
@@ -398,6 +338,12 @@ void GameOpLua()
 	LUA.pushfunction("GetWindowSize", [](lua_State* L) -> int
 		{
 			PushVector(vec2(window->getSize().x, window->getSize().y));
+			return 1;
+		});
+
+	LUA.pushfunction("GetVersion", [](lua_State* L) -> int
+		{
+			lua_pushstring(L, PROJECT_VER);
 			return 1;
 		});
 }

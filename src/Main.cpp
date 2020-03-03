@@ -36,8 +36,7 @@ int main(int argc, char *argv[]) {
 	
 	//all declarations
 	sf::RenderWindow window;
-  
-	Renderer rend(main_config);
+
 	sf::Texture main_txt, screenshot_txt;
 	
 	sf::Clock clock;
@@ -46,8 +45,7 @@ int main(int argc, char *argv[]) {
 	mouse_pos = sf::Vector2i(0, 0);
 	mouse_prev_pos = sf::Vector2i(0, 0);
   
-	SetPointers(&window, &rend, &main_txt, &screenshot_txt);
-
+	SetPointers(&window, &main_txt, &screenshot_txt);
 	ApplySettings(nullptr);
 
 	window.requestFocus();
@@ -56,8 +54,6 @@ int main(int argc, char *argv[]) {
 	//sf::Image icon;
 	//icon.loadFromFile(icon_png); 
 	//window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
-
-	rend.LoadExternalTextures(textures_folder);
   
 	sf::View default_window_view = window.getDefaultView();
 
@@ -65,7 +61,7 @@ int main(int argc, char *argv[]) {
 	io_state.window_size = sf::Vector2f(window.getSize().x, window.getSize().y);
 	float prev_s = 0;
 	
-	//init LUA
+	//initialize LUA
 	WrapInterface(&LUA);
 	WrapShaders(&LUA);
 	WrapResources(&LUA);
@@ -141,7 +137,6 @@ int main(int argc, char *argv[]) {
 				window.setView(default_window_view);
 				io_state.window_size = sf::Vector2f(window.getSize().x, window.getSize().y);
 				UpdateAspectRatio(window.getSize().x, window.getSize().y);
-				rend.camera.SetAspectRatio((float)window.getSize().x / (float)window.getSize().y);
 				break;
 			case sf::Event::TouchBegan:
 				touched[event.touch.finger] = true;
@@ -314,7 +309,6 @@ int main(int argc, char *argv[]) {
 		UpdateAllObjects(&window, io_state);
 		io_state.isKeyPressed = false;
 		window.setView(default_window_view);
-		UpdateUniforms();
 		
 		if (!skip_frame) {
 			if (TOUCH_MODE)

@@ -12,9 +12,7 @@ function OpenMainMenu()
 	local title = Text.new("Fractallica", 120);
 	title:SetBorderColor(Color.Black);
 	title:SetBorderWidth(4);
-	local version = Text.new("Alpha 0.0.2", 40);
-	--version.SetBorderColor(Color.Black);
-	--version.SetBorderWidth(4);
+	local version = Text.new("Alpha " .. GetVersion(), 40);
 	
 	function exitcallback(object)
 		CloseFractallica();

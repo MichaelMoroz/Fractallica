@@ -22,7 +22,6 @@ function Free_Camera_Update()
 		dx = -cam_velocity;
 	end;
 	
-	
 	camera:Move(dx, dy, dz);
 	if(IsMousePressed(0)) then
 		local dmouse = GetMouseVel();
@@ -41,6 +40,6 @@ function Free_Camera_Update()
 		OpenMainMenu();
 	end;
 	
-	cam_velocity = cam_velocity*(1+0.01*GetMouseWheel());
+	cam_velocity = cam_velocity*(1+0.1*GetMouseWheel());
 	
 end;

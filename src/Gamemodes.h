@@ -41,6 +41,8 @@ extern float target_fps;
 
 extern GameMode game_mode;
 
+void SetPointers(sf::RenderWindow * w, sf::Texture * main, sf::Texture * screensht);
+
 void RunInitialScript();
 void RunLoopScript();
 void RunRenderScript();
@@ -56,12 +58,10 @@ void PauseGame(sf::RenderWindow& window);
 int DirExists(const char *path);
 
 
-void SetPointers(sf::RenderWindow * w, Renderer * rd, sf::Texture * main, sf::Texture * screensht);
 void GameOpLua();
 sf::Vector2i getResolution(int i);
 
 void TakeScreenshot();
-void UpdateUniforms();
 void SetCameraFocus(float f);
 void ApplySettings(void * data);
 
