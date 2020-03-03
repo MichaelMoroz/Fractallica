@@ -394,6 +394,12 @@ void GameOpLua()
 			LOCAL.SetLanguage(lang);
 			return 1;
 		});
+
+	LUA.pushfunction("GetWindowSize", [](lua_State* L) -> int
+		{
+			PushVector(vec2(window->getSize().x, window->getSize().y));
+			return 1;
+		});
 }
 
 void RestoreSettings(void* data)

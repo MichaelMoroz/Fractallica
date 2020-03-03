@@ -6,8 +6,8 @@ void WrapShaders(LuaVM* LVM)
 	LUA.setfunction("new", [](lua_State* L) -> int
 		{
 			std::string path = std::string(lua_tostring(L, -1));
-			void* newobj = lua_newuserdata(L, sizeof(ComputeShader));
-			new (newobj) ComputeShader(path);
+			ComputeShader** newobj = (ComputeShader**)lua_newuserdata(L, sizeof(void*));
+			*newobj = new ComputeShader(path);
 			luaL_getmetatable(L, "ShaderMetaTable");
 			lua_setmetatable(L, -2);
 			return 1;
@@ -15,7 +15,7 @@ void WrapShaders(LuaVM* LVM)
 
 	LUA.setfunction("Run", [](lua_State* L) -> int
 		{
-			ComputeShader* obj = (ComputeShader*)lua_touserdata(L, -3);
+			ComputeShader* obj = *(ComputeShader**)lua_touserdata(L, -3);
 			float nx = ceil(lua_tonumber(L, -2));
 			float ny = ceil(lua_tonumber(L, -1));
 			obj->Run(vec2(nx, ny));
@@ -24,7 +24,7 @@ void WrapShaders(LuaVM* LVM)
 
 	LUA.setfunction("setInt", [](lua_State* L) -> int
 		{
-			ComputeShader* obj = (ComputeShader*)lua_touserdata(L, -3);
+			ComputeShader* obj = *(ComputeShader**)lua_touserdata(L, -3);
 			std::string name = std::string(lua_tostring(L, -2));
 			int nx = lua_tonumber(L, -1);
 			obj->setUniform(name, nx);
@@ -33,7 +33,7 @@ void WrapShaders(LuaVM* LVM)
 
 	LUA.setfunction("setFloat", [](lua_State* L) -> int
 		{
-			ComputeShader* obj = (ComputeShader*)lua_touserdata(L, -3);
+			ComputeShader* obj = *(ComputeShader**)lua_touserdata(L, -3);
 			std::string name = std::string(lua_tostring(L, -2));
 			float nx = lua_tonumber(L, -1);
 			obj->setUniform(name, nx);
@@ -42,7 +42,7 @@ void WrapShaders(LuaVM* LVM)
 
 	LUA.setfunction("setVec2", [](lua_State* L) -> int
 		{
-			ComputeShader* obj = (ComputeShader*)lua_touserdata(L, -4);
+			ComputeShader* obj = *(ComputeShader**)lua_touserdata(L, -4);
 			std::string name = std::string(lua_tostring(L, -3));
 			float nx = lua_tonumber(L, -2);
 			float ny = lua_tonumber(L, -1);
@@ -52,7 +52,7 @@ void WrapShaders(LuaVM* LVM)
 
 	LUA.setfunction("setVec3", [](lua_State* L) -> int
 		{
-			ComputeShader* obj = (ComputeShader*)lua_touserdata(L, -5);
+			ComputeShader* obj = *(ComputeShader**)lua_touserdata(L, -5);
 			std::string name = std::string(lua_tostring(L, -4));
 			float nx = lua_tonumber(L, -3);
 			float ny = lua_tonumber(L, -2);
@@ -63,7 +63,7 @@ void WrapShaders(LuaVM* LVM)
 
 	LUA.setfunction("setBool", [](lua_State* L) -> int
 		{
-			ComputeShader* obj = (ComputeShader*)lua_touserdata(L, -3);
+			ComputeShader* obj = *(ComputeShader**)lua_touserdata(L, -3);
 			std::string name = std::string(lua_tostring(L, -2));
 			bool nx = lua_toboolean(L, -1);
 			obj->setUniform(name, nx);
@@ -72,7 +72,7 @@ void WrapShaders(LuaVM* LVM)
 
 	LUA.setfunction("setCameraObj", [](lua_State* L) -> int
 		{
-			ComputeShader* obj = (ComputeShader*)lua_touserdata(L, -3);
+			ComputeShader* obj = *(ComputeShader**)lua_touserdata(L, -3);
 			std::string name = std::string(lua_tostring(L, -2));
 			Camera* cam = (Camera*)lua_touserdata(L, -1);
 			obj->setCameraObj(name, cam->GetGLdata());
@@ -81,7 +81,7 @@ void WrapShaders(LuaVM* LVM)
 
 	LUA.setfunction("setTexture32f", [](lua_State* L) -> int
 		{
-			ComputeShader* obj = (ComputeShader*)lua_touserdata(L, -3);
+			ComputeShader* obj = *(ComputeShader**)lua_touserdata(L, -3);
 			std::string name = std::string(lua_tostring(L, -2));
 			GLuint X = *(GLuint*)lua_touserdata(L, -1);
 			obj->setUniform(name, X);
@@ -90,7 +90,7 @@ void WrapShaders(LuaVM* LVM)
 
 	LUA.setfunction("setTexture", [](lua_State* L) -> int
 		{
-			ComputeShader* obj = (ComputeShader*)lua_touserdata(L, -3);
+			ComputeShader* obj = *(ComputeShader**)lua_touserdata(L, -3);
 			std::string name = std::string(lua_tostring(L, -2));
 			sf::Texture* X = *(sf::Texture**)lua_touserdata(L, -1);
 			obj->setUniform(name, X->getNativeHandle());
@@ -101,7 +101,7 @@ void WrapShaders(LuaVM* LVM)
 	///object destructor
 	LUA.setfunction("__gc", [](lua_State* L) -> int
 		{
-			ComputeShader* obj = (ComputeShader*)lua_touserdata(L, -1);
+			ComputeShader* obj = *(ComputeShader**)lua_touserdata(L, -1);
 			obj->Delete();
 			return 0;
 		});
@@ -190,6 +190,30 @@ void WrapShaders(LuaVM* LVM)
 			obj->SetExposure(exposure);
 			return 1;
 		});
+
+	LUA.setfunction("Update", [](lua_State* L) -> int
+		{
+			Camera* obj = (Camera*)lua_touserdata(L, -2);
+			float dt = lua_tonumber(L, -1);
+			obj->Update(dt);
+			return 1;
+		});
+	LUA.setfunction("SetResolution", [](lua_State* L) -> int
+		{
+			Camera* obj = (Camera*)lua_touserdata(L, -3);
+			float x = lua_tonumber(L, -2);
+			float y = lua_tonumber(L, -1);
+			obj->SetResolution(vec2(x,y));
+			return 1;
+		});
+	LUA.setfunction("SetAspectRatio", [](lua_State* L) -> int
+		{
+			Camera* obj = (Camera*)lua_touserdata(L, -2);
+			float ar = lua_tonumber(L, -1);
+			obj->SetAspectRatio(ar);
+			return 1;
+		});
+
 
 	LUA.newmetatable("CameraMetaTable");
 	///object destructor

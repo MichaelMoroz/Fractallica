@@ -7,6 +7,7 @@
 #include<Interface.h>
 #include<Renderer.h>
 #include<LuaVM.h>
+#include<ResourcesLua.h>
 
 #define DEBUG_MODE 1
 

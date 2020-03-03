@@ -7,7 +7,7 @@ dofile( "scripts/libs/table.save-1.0.lua" )
 dofile( "scripts/libs/definitions.lua" )
 dofile( "scripts/menus/main_menu.lua" );
 dofile( "scripts/menus/input_test.lua" );
-render = {width = 320, height = 240};
+render = {width = 640, height = 480};
 
 --initial stuff
 --fullscreen and FPS limit
@@ -21,9 +21,9 @@ frame = 0;
 
 camera = Camera.new();
 
-camera:setPosition(-100, 0, 0);
+camera:setPosition(-10, 0, 0);
 camera:SetExposure(0.5);
-
+camera:SetResolution(render.width, render.height);
 OpenMainMenu();
 
 OpenInputTest();

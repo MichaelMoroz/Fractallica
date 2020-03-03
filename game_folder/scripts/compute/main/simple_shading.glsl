@@ -52,5 +52,5 @@ void main() {
 	}
 	
 	
-	imageStore(final_color, global_pos, vec4(HDRmapping(color.xyz+vec3(td), Camera.exposure), 1));	 
+	imageStore(final_color, global_pos, vec4(HDRmapping(color.xyz, Camera.exposure), 1));	 
 }

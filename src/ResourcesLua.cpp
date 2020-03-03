@@ -169,6 +169,18 @@ void WrapResources(LuaVM * LVM)
 			lua_setmetatable(L, -2);
 			return 1;
 		});
+	LUA.setfunction("x", [](lua_State* L) -> int
+		{
+			vec2* obj = *(vec2**)lua_touserdata(L, -1);		
+			lua_pushnumber(L, obj->x);
+			return 1;
+		});
+	LUA.setfunction("y", [](lua_State* L) -> int
+		{
+			vec2* obj = *(vec2**)lua_touserdata(L, -1);
+			lua_pushnumber(L, obj->y);
+			return 1;
+		});
 
 	LUA.newmetatable("vec2");
 	///object destructor
@@ -226,6 +238,24 @@ void WrapResources(LuaVM * LVM)
 			*newobj = new vec3(x, y, z);
 			luaL_getmetatable(L, "vec3");
 			lua_setmetatable(L, -2);
+			return 1;
+		});
+	LUA.setfunction("x", [](lua_State* L) -> int
+		{
+			vec3* obj = *(vec3**)lua_touserdata(L, -1);
+			lua_pushnumber(L, obj->x);
+			return 1;
+		});
+	LUA.setfunction("y", [](lua_State* L) -> int
+		{
+			vec3* obj = *(vec3**)lua_touserdata(L, -1);
+			lua_pushnumber(L, obj->y);
+			return 1;
+		});
+	LUA.setfunction("z", [](lua_State* L) -> int
+		{
+			vec3* obj = *(vec3**)lua_touserdata(L, -1);
+			lua_pushnumber(L, obj->z);
 			return 1;
 		});
 
@@ -286,6 +316,30 @@ void WrapResources(LuaVM * LVM)
 			*newobj = new vec4(x, y, z, w);
 			luaL_getmetatable(L, "vec4");
 			lua_setmetatable(L, -2);
+			return 1;
+		});
+	LUA.setfunction("x", [](lua_State* L) -> int
+		{
+			vec4* obj = *(vec4**)lua_touserdata(L, -1);
+			lua_pushnumber(L, obj->x);
+			return 1;
+		});
+	LUA.setfunction("y", [](lua_State* L) -> int
+		{
+			vec4* obj = *(vec4**)lua_touserdata(L, -1);
+			lua_pushnumber(L, obj->y);
+			return 1;
+		});
+	LUA.setfunction("z", [](lua_State* L) -> int
+		{
+			vec4* obj = *(vec4**)lua_touserdata(L, -1);
+			lua_pushnumber(L, obj->z);
+			return 1;
+		});
+	LUA.setfunction("w", [](lua_State* L) -> int
+		{
+			vec4* obj = *(vec4**)lua_touserdata(L, -1);
+			lua_pushnumber(L, obj->w);
 			return 1;
 		});
 

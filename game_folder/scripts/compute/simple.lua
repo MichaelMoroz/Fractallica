@@ -21,8 +21,8 @@ HDR_prev = Texture32f.new(render.width,render.height);
 
 function ApplyDefaultParams(shader)
 	shader:setFloat("iFracScale",1.93);
-	shader:setFloat("iFracAng1",1.93);
-	shader:setFloat("iFracAng2",1.93);
+	shader:setFloat("iFracAng1", 1.34637);
+	shader:setFloat("iFracAng2",1.58);
 	shader:setVec3("iFracShift", -2.31, 1.123, 1.56);
 	shader:setVec3("iFracCol", 0.42, 0.38, 0.19);
 	shader:setVec3("iMarblePos", -1.71412, 1.84836, -1.70884);
@@ -30,17 +30,24 @@ function ApplyDefaultParams(shader)
 	shader:setFloat("iMarbleRad",0.02);
 	shader:setFloat("iFlagScale",0.02);
 	shader:setInt("FRACTAL_ITER",16);
+	shader:setBool("PBR_ENABLED", true);
 	shader:setInt("MARBLE_MODE",0);
-	shader:setFloat("time",0);
+	shader:setFloat("time",10.);
 	shader:setFloat("PBR_METALLIC",0.5);
 	shader:setFloat("PBR_ROUGHNESS",0.5);
-	shader:setVec3("LIGHT_DIRECTION", 0.0, 2.13651, 1.74782);
-	shader:setBool("SHADOWS_ENABLED",1);
-	shader:setBool("FRACTAL_GLOW",0);
-	shader:setBool("FLAG_GLOW",0);
+	shader:setVec3("LIGHT_DIRECTION", 0.0, 1.0, 0.0);
+	shader:setBool("SHADOWS_ENABLED",true);
+	shader:setBool("FRACTAL_GLOW",false);
+	shader:setBool("FLAG_GLOW",false);
 	shader:setFloat("gamma_material",0.6);
 	shader:setFloat("gamma_sky",0.6);
 	shader:setFloat("gamma_camera",2.2);
+end;
+
+function ApplyParams(shader)
+	shader:setCameraObj("Camera", camera);
+	shader:setInt("iFrame", frame);
+	shader:setFloat("iFracAng1", 3.*math.sin(frame/100));
 end;
 
 ApplyDefaultParams(MRRM1);
@@ -48,12 +55,9 @@ ApplyDefaultParams(MRRM2);
 ApplyDefaultParams(simple_render);
 
 function DoRender()
-	MRRM1:setCameraObj("Camera", camera);
-	MRRM1:setInt("iFrame", frame);
-	MRRM2:setCameraObj("Camera", camera);
-	MRRM2:setInt("iFrame", frame);
-	simple_render:setCameraObj("Camera", camera);
-	simple_render:setInt("iFrame", frame);
+	ApplyParams(MRRM1);
+	ApplyParams(MRRM2);
+	ApplyParams(simple_render);
 
 	Bind32f(0, depth0, GL_READ_WRITE);
 	Bind32f(1, depth1, GL_READ_WRITE);
