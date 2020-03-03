@@ -64,7 +64,7 @@ function DoRender()
 	Bind32f(2, various, GL_READ_WRITE);
 	Bind32f(3, depth, GL_READ_WRITE);
 	Bind32f(4, HDR, GL_READ_WRITE);
-	MRRM1:Run(render.width/group_size,render.width/group_size);
+	MRRM1:Run(render.width/(group_size*MRRM_scale),render.width/(group_size*MRRM_scale));
 	
 	Bind32f(0, depth0, GL_READ_WRITE);
 	Bind32f(1, depth1, GL_READ_WRITE);
