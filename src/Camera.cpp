@@ -15,18 +15,18 @@ void Camera::RotateLR(float a)
 
 void Camera::RotateUD(float a)
 {
-	//rotate around sideways direction
-	quat rotation = angleAxis(degrees(a), GetDirZ());
-	dirx = rotation*dirx;
-	diry = rotation*diry;
+	//rotate around look direction
+	quat rotation = angleAxis(degrees(a), GetDirX());
+	diry = rotation * diry;
+	dirz = rotation * dirz;
 }
 
 void Camera::RotateRoll(float a)
 {
-	//rotate around look direction
-	quat rotation = angleAxis(degrees(a), GetDirX());
-	diry = rotation*diry;
-	dirz = rotation*dirz;
+	//rotate around sideways direction
+	quat rotation = angleAxis(degrees(a), GetDirZ());
+	dirx = rotation * dirx;
+	diry = rotation * diry;
 }
 
 void Camera::SetRotation(float a, float b, float c)

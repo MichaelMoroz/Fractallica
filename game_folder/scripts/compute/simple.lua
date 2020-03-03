@@ -47,7 +47,7 @@ end;
 function ApplyParams(shader)
 	shader:setCameraObj("Camera", camera);
 	shader:setInt("iFrame", frame);
-	shader:setFloat("iFracAng1", 3.*math.sin(frame/100));
+	shader:setFloat("iFracAng1", 3.*math.sin(frame/1000));
 end;
 
 ApplyDefaultParams(MRRM1);

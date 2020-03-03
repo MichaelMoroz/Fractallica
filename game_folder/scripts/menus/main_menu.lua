@@ -1,4 +1,6 @@
 function OpenMainMenu()
+	CURRENT_MODE = GAME_MODES.MENU;
+	
 	RemoveAllObjects();
 	--all objects here are local, thus are destroyed after this function ends
 	local mainmenu = MenuBox.new(1000,800);
@@ -19,10 +21,16 @@ function OpenMainMenu()
 	end;
 	local exitbtn = Button.new("Exit", 600, 50, exitcallback);
 	
+	function freecam(object)
+		Free_Camera_Mode();
+	end;
+	local fcbtn = Button.new("Free camera mode", 600, 50, freecam);
+	
 	mainmenu:AddObject(title, Allign.LEFT);
 	mainmenu:AddObject(margin, Allign.CENTER);
 	mainmenu:AddObject(version, Allign.LEFT);
 	mainmenu:AddObject(margin, Allign.CENTER);
+	mainmenu:AddObject(fcbtn, Allign.LEFT);
 	mainmenu:AddObject(exitbtn, Allign.LEFT);
 	
 	--add a copy of the mainmenu object to the global render/update list

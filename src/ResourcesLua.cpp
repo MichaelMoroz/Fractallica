@@ -133,13 +133,6 @@ void WrapResources(LuaVM * LVM)
 			lua_pushboolean(L, pressed);
 			return 1;
 		});
-	LUA.pushfunction("IsMousePressed", [](lua_State* L) -> int
-		{
-			int keynum = lua_tonumber(L, -1);
-			bool pressed = io_state.mouse[keynum];
-			lua_pushboolean(L, pressed);
-			return 1;
-		});
 	LUA.pushfunction("GetMousePos", [](lua_State* L) -> int
 		{
 			PushVector(vec2(io_state.mouse_pos.x, io_state.mouse_pos.y));
@@ -148,6 +141,11 @@ void WrapResources(LuaVM * LVM)
 	LUA.pushfunction("GetMouseVel", [](lua_State* L) -> int
 		{
 			PushVector(vec2(io_state.mouse_speed.x, io_state.mouse_speed.y));
+			return 1;
+		});
+	LUA.pushfunction("GetMouseWheel", [](lua_State* L) -> int
+		{
+			lua_pushnumber(L, io_state.wheel);
 			return 1;
 		});
 	LUA.pushfunction("GetWindowSize", [](lua_State* L) -> int
