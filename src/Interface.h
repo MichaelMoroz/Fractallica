@@ -120,7 +120,7 @@ public:
 
 	enum Allign
 	{
-		LEFT, CENTER, RIGHT
+		LEFT, CENTER, RIGHT, FREE
 	};
 
 	void ApplyScroll(float x);
@@ -413,11 +413,28 @@ public:
 
 class Slider : public Box
 {
+public:
+	Slider(float w, float h, float val, float min, float max, float dv);
+
+	Slider(Slider& A);
+	Slider(Slider&& A);
+
+	void operator=(Slider& A);
+	void operator=(Slider&& A);
+
+	void CreateCallbacks();
+
+	virtual Object* GetCopy();
+	float GetValue();
+
+	float max_val, min_val;
+	float dval;
 	float value;
 };
 
 class DropDownList : public Box
 {
+public:
 	int state;
 	std::map<int, std::string> list;
 	Box bropbox;
@@ -425,6 +442,7 @@ class DropDownList : public Box
 
 class CheckBox : public Box
 {
+public:
 	bool state;
 };
 

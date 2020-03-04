@@ -12,7 +12,7 @@ function OpenDebugInfo()
 	local fpsname = Text.new("FPS:", 30);
 	local fpstxt = Text.new("", 30);
 	function fpsupd(object)
-		object:SetText(tostring(GetFPS()));
+		object:SetText(tostring(math.floor(GetFPS()+0.5)));
 	end
 	fpstxt:SetDefaultFunction(true, fpsupd);
 	

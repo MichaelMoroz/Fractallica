@@ -1,5 +1,5 @@
 --Interface alligns
-Allign = { LEFT=0, CENTER=1, RIGHT=2 }
+Allign = { LEFT=0, CENTER=1, RIGHT=2, FREE=3 }
 
 GL_READ_ONLY = 0x88B8;
 GL_WRITE_ONLY = 0x88B9;

@@ -48,12 +48,19 @@ function OpenInputTest()
 	boxD:SetDefaultFunction(true, CD);
 	
 	local inbox = InputBox.new(280, 30);
+	local slid = Slider.new(280, 30, 5, 1, 0, 10);
+	
+	local margin = Box.new(200, 5);
+	margin:SetBackgroundColor(Color.Transparent);
 	
 	wind:AddObject(boxW, Allign.CENTER);
 	wind:AddObject(boxA, Allign.LEFT);
 	wind:AddObject(boxD, Allign.RIGHT);
 	wind:AddObject(boxS, Allign.CENTER);
+	wind:AddObject(margin, Allign.CENTER);
 	wind:AddObject(inbox, Allign.CENTER);
+	wind:AddObject(margin, Allign.CENTER);
+	wind:AddObject(slid, Allign.CENTER);
 	
 	AddGlobalObject(wind);
 end;

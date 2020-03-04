@@ -259,7 +259,39 @@ void WrapInterface(LuaVM* LVM)
 	LUA.setvalue("__index", windowid);
 
 	/*
-		Window child class wrapper
+		Slider child class wrapper
+	*/
+	//float x, float y, float dx, float dy,
+	int sliderid = LUA.newtable("Slider");
+	LUA.setfunction("new", [](lua_State* L) -> int
+		{
+			float dX = lua_tonumber(L, -6);
+			float dY = lua_tonumber(L, -5);
+			float val = lua_tonumber(L, -4);
+			float dv = lua_tonumber(L, -3);
+			float maxv = lua_tonumber(L, -2);
+			float minv = lua_tonumber(L, -1);
+			void** newobj = (void**)lua_newuserdata(L, sizeof(void*));
+			*newobj = new Slider(dX, dY, val, dv, maxv, minv);
+			luaL_getmetatable(L, "SliderMetaTable");
+			lua_setmetatable(L, -2);
+			return 1;
+		});
+	//inheritance of Box methods
+	LUA.setmetatable("BoxMetaTable");
+
+	LUA.newmetatable("SliderMetaTable");
+	///object destructor
+	LUA.setfunction("__gc", [](lua_State* L) -> int
+		{
+			Slider* obj = *(Slider**)lua_touserdata(L, -1);
+			obj->~Slider();
+			return 0;
+		});
+	LUA.setvalue("__index", sliderid);
+
+	/*
+		Image child class wrapper
 	*/
 	//float x, float y, float dx, float dy,
 	int imgid = LUA.newtable("ImageBox");

@@ -203,17 +203,7 @@ void UpdateAllObjects(sf::RenderWindow * window, InputState& state)
 	}
 
 	del.clear();
-	
-	//render stuff in the following order
-	for (auto &z : z_value)
-	{
-		if (global_objects.count(z) != 0) 
-		{
-			global_objects[z].get()->used_view = default_view;
-			global_objects[z].get()->Update(window, state);
-		}
-	}
-	
+
 	if (global_objects.count(global_focus) != 0)
 	{
 		//put the focused global object to the top
@@ -224,7 +214,6 @@ void UpdateAllObjects(sf::RenderWindow * window, InputState& state)
 		{
 			if (global_objects.count(top_id) != 0)
 			{
-				global_objects[top_id]->UpdateAction(window, state);
 				if (!global_objects[global_focus].get()->static_object)
 				{
 					int global_z = z_val(global_focus);
@@ -233,10 +222,18 @@ void UpdateAllObjects(sf::RenderWindow * window, InputState& state)
 				}
 			}
 		}
-		
-		//update callbacks in the focused object
-		global_objects[global_focus]->UpdateAction(window, state);
 	}
+	
+	//render stuff in the following order
+	for (auto &z : z_value)
+	{
+		if (global_objects.count(z) != 0)
+		{
+			global_objects[z].get()->used_view = default_view;
+			global_objects[z].get()->Update(window, state);
+			global_objects[z].get()->UpdateAction(window, state);
+		}
+	}	
 }
 
 
@@ -606,7 +603,7 @@ void Object::copy(Object & A)
 	for (auto &a : A.callback) callback.push_back(a);
 	for (auto &a : A.hoverfn) hoverfn.push_back(a);
 	for (auto &a : A.defaultfn) defaultfn.push_back(a);
-	for (auto& a : A.defaultglobal) defaultglobal.push_back(a);
+	for (auto &a : A.defaultglobal) defaultglobal.push_back(a);
 
 	id = all_obj_id;
 	all_obj_id++;
@@ -731,11 +728,11 @@ void Box::Draw(sf::RenderWindow * window, InputState& state)
 		int tries = 0;
 		int obj_id = obj.get()->id;
 		float obj_h = obj.get()->curstate.size.y;
+		sf::Vector2f obj_pos = obj.get()->defaultstate.position;
 		while (not_placed && tries < 2) //try to place the object somewhere
 		{
 			float space_left = defaultstate.size.x - cur_shift_x1 - cur_shift_x2;
 			float obj_width = obj.get()->curstate.size.x;
-
 			if (space_left >= obj_width || space_left >= defaultstate.size.x - 2 * curstate.margin)
 			{
 				not_placed = false;
@@ -759,6 +756,10 @@ void Box::Draw(sf::RenderWindow * window, InputState& state)
 					cur_shift_x2 += obj_width + curstate.margin;
 					line_height = std::max(obj_h, line_height);
 					break;
+				case FREE:
+					obj.get()->curstate.position = sf::Vector2f(curstate.position.x + obj_pos.x, curstate.position.y + obj_pos.y);
+					obj.get()->SetPosition(curstate.position.x + obj_pos.x, curstate.position.y + obj_pos.y);
+					break;
 				}
 			}
 			else
@@ -771,10 +772,7 @@ void Box::Draw(sf::RenderWindow * window, InputState& state)
 			}
 
 		}
-		if (tries >= 2)
-		{
-			//ERROR_MSG("Object does not fit in the box.");
-		}
+		
 		sf::FloatRect obj_box(obj.get()->curstate.position, obj.get()->curstate.size);
 		sf::FloatRect seen_part = overlap(obj_box, this_view);
 		//if the object is seen in the view, then update it
@@ -784,6 +782,8 @@ void Box::Draw(sf::RenderWindow * window, InputState& state)
 			obj.get()->Update(window, state);
 		}
 
+		//return object to prev position
+		if(A == FREE) obj.get()->SetPosition(obj_pos.x, obj_pos.y);
 	}
 
 	cur_shift_y += line_height + curstate.margin;
@@ -1490,4 +1490,105 @@ Object* InputBox::GetCopy()
 void* InputBox::GetData()
 {
 	return nullptr;
+}
+
+Slider::Slider(float w, float h, float val, float min, float max, float dv)
+{
+	SetSize(w, h);
+
+	max_val = max; min_val = min;
+	dval = dv;
+	value = val;
+
+	Box pull(h*0.8, h*0.8);
+	pull.SetBackgroundColor(sf::Color::Red);
+	pull.SetPosition(w * 0.5 - h * 0.4, h * 0.5 - h * 0.4-1.f);
+	Box vals(10, h);
+	vals.SetBackgroundColor(sf::Color::Blue);
+	vals.SetPosition(w * 0.5 - h * 0.4, -1.f);
+
+	this->AddObject(&pull, Allign::FREE);
+	this->AddObject(&vals, Allign::FREE);
+	CreateCallbacks();
+}
+
+Slider::Slider(Slider & A)
+{
+	*this = A;
+}
+
+Slider::Slider(Slider && A)
+{
+	*this = A;
+}
+
+void Slider::operator=(Slider& A)
+{
+	Box::operator=(A);
+	max_val = A.max_val;
+	min_val = A.min_val;
+	dval = A.dval;
+	value = A.value;
+	CreateCallbacks();
+}
+
+void Slider::operator=(Slider&& A)
+{
+	Box::operator=(A);
+	std::swap(max_val, A.max_val);
+	std::swap(min_val, A.min_val);
+	std::swap(dval, A.dval);
+	std::swap(value, A.value);
+	CreateCallbacks();
+}
+
+
+void Slider::CreateCallbacks()
+{
+	//slider thing
+	this->objects[1].get()->SetMainCallbackFunction([parent = this](sf::RenderWindow * window, InputState & state, Object* this_obj)
+		{
+			sf::Vector2f sz0 = parent->curstate.size;
+			sf::Vector2f sz1 = this_obj->curstate.size;
+			sf::Vector2f ps1 = this_obj->defaultstate.position;
+			float newx = std::min(std::max(ps1.x + state.mouse_speed.x, 0.f), sz0.x - sz1.x);
+			float newy = ps1.y;
+			this_obj->SetPosition(newx, newy);
+		}, false);
+
+	//pull thing
+	this->objects[0].get()->SetMainCallbackFunction([parent = this](sf::RenderWindow * window, InputState & state, Object* this_obj)
+		{
+			sf::Vector2f sz0 = parent->curstate.size;
+			sf::Vector2f sz1 = this_obj->curstate.size;
+			sf::Vector2f ps1 = this_obj->defaultstate.position;
+			float newx = std::min(std::max(ps1.x + state.mouse_speed.x, 0.f), sz0.x - sz1.x);
+			float newy = ps1.y;
+			this_obj->SetPosition(newx, newy);
+			
+		}, false);
+
+	this->objects[0].get()->SetMainDefaultFunction([parent = this](sf::RenderWindow * window, InputState & state, Object* this_obj)
+		{
+			sf::Vector2f sz0 = parent->curstate.size;
+			sf::Vector2f sz1 = this_obj->curstate.size;
+			sf::Vector2f ps1 = this_obj->defaultstate.position;
+			if (!state.mouse[0])
+			{
+				this_obj->SetPosition(sz0.x*0.5 - sz1.x*0.5, sz0.y*0.5 - sz1.y*0.5 - 1.f);
+			}
+		}, true);
+}
+
+Object * Slider::GetCopy()
+{
+	return static_cast<Object*>(new Slider(*this));
+}
+
+float Slider::GetValue()
+{
+	if (dval == 0.f)
+		return value;
+	else 
+		return dval*round((value-min_val)/dval) + min_val;
 }
