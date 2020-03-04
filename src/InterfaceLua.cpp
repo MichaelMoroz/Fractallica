@@ -200,6 +200,34 @@ void WrapInterface(LuaVM* LVM)
 	LUA.setvalue("__index", buttonid);
 
 	/*
+		InputBox child class wrapper
+	*/
+
+	int inboxid = LUA.newtable("InputBox");
+	LUA.setfunction("new", [](lua_State* L) -> int
+		{
+			float dX = lua_tonumber(L, -2);
+			float dY = lua_tonumber(L, -1);
+			void** newobj = (void**)lua_newuserdata(L, sizeof(void*));
+			*newobj = new InputBox(dX, dY);
+			luaL_getmetatable(L, "InputBoxMetaTable");
+			lua_setmetatable(L, -2);
+			return 1;
+		});
+	//inheritance of Box methods
+	LUA.setmetatable("BoxMetaTable");
+
+	LUA.newmetatable("InputBoxMetaTable");
+	///object destructor
+	LUA.setfunction("__gc", [](lua_State* L) -> int
+		{
+			InputBox* obj = *(InputBox**)lua_touserdata(L, -1);
+			obj->~InputBox();
+			return 0;
+		});
+	LUA.setvalue("__index", inboxid);
+
+	/*
 		Window child class wrapper
 	*/
 	//float x, float y, float dx, float dy,
@@ -322,6 +350,8 @@ void WrapInterface(LuaVM* LVM)
 			DisplayError(txt);
 			return 1;
 		});
+
+	LUA.Clear();
 }
 
 void AddObject2LuaStack(LuaVM* LVM, Object* obj)

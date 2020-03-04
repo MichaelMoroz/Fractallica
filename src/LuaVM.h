@@ -40,7 +40,7 @@ public:
 	void setvalue(std::string name, int val_id);
 	void AddToGlobal(std::string name, void* var);
 	void setlightuserdata(std::string name, void* var);
-
+	void Clear();
 	~LuaVM();
 
 private:

@@ -1,21 +1,15 @@
 #include "Gamemodes.h"
 
-
 //Global variables
-sf::Vector2i mouse_pos, mouse_prev_pos;
 InputState io_state;
 
 bool fullscreen_current = false;
-bool all_keys[sf::Keyboard::KeyCount] = { 0 };
-bool mouse_clicked = false;
-bool show_cheats = false;
-bool taken_screenshot = false;
 sf::Clock screenshot_clock;
 //Constants
 
 float target_fps = 60.0f;
-
-GameMode game_mode = MAIN_MENU;
+float smooth_fps = target_fps;
+float lag_ms = 0.0f;
 
 sf::RenderWindow *window;
 sf::Texture *main_txt;
@@ -155,8 +149,8 @@ void DisplayMessage(std::string text)
 void LockMouse(sf::RenderWindow& window) {
 	window.setMouseCursorVisible(false);
 	sf::Mouse::setPosition(sf::Vector2i(window.getSize().x*0.5, window.getSize().y*0.5), window);
-	mouse_prev_pos = sf::Vector2i(window.getSize().x * 0.5, window.getSize().y * 0.5);
-	mouse_pos = sf::Vector2i(window.getSize().x * 0.5, window.getSize().y * 0.5);
+	io_state.mouse_prev = sf::Vector2f(window.getSize().x * 0.5, window.getSize().y * 0.5);
+	io_state.mouse_pos = sf::Vector2f(window.getSize().x * 0.5, window.getSize().y * 0.5);
 }
 
 void UnlockMouse(sf::RenderWindow& window) {
@@ -243,51 +237,6 @@ void InitializeWindow(bool fullscreen, float FPSlimit)
 	window->setFramerateLimit(FPSlimit);
 }
 
-void ApplySettings(void *data)
-{
-	//if window is not yet created or when the fullscreen setting is changed
-	if (!window->isOpen() || SETTINGS.stg.fullscreen != fullscreen_current)
-	{
-		fullscreen_current = SETTINGS.stg.fullscreen;
-
-		sf::VideoMode screen_size;
-		sf::Uint32 window_style;
-		bool fullscreen = SETTINGS.stg.fullscreen;
-		if (fullscreen) {
-			screen_size = sf::VideoMode::getDesktopMode();
-			window_style = sf::Style::Fullscreen;
-		}
-		else {
-			screen_size = sf::VideoMode::getDesktopMode();
-			window_style = sf::Style::Default;
-		}
-
-		//GL settings
-		sf::ContextSettings settings;
-		settings.majorVersion = 4;
-		settings.minorVersion = 3;
-
-		window->create(screen_size, "Fractallica", window_style, settings);
-		window->setVerticalSyncEnabled(SETTINGS.stg.VSYNC);
-		window->setKeyRepeatEnabled(false);
-
-		INIT();
-
-		if (!fullscreen)
-		{
-			sf::VideoMode fs_size = sf::VideoMode::getDesktopMode();
-			window->setSize(sf::Vector2u(fs_size.width, fs_size.height - 100.f));
-			window->setPosition(sf::Vector2i(0, 0));
-		}
-
-		SETTINGS.first_start = false;
-	}
-
-	window->setFramerateLimit(SETTINGS.stg.fps_limit);
-	std::vector<std::string> langs = LOCAL.GetLanguages();
-	LOCAL.SetLanguage(langs[SETTINGS.stg.language]);
-}
-
 //global Lua functions
 void GameOpLua()
 {
@@ -346,10 +295,24 @@ void GameOpLua()
 			lua_pushstring(L, PROJECT_VER);
 			return 1;
 		});
-}
 
-void RestoreSettings(void* data)
-{
-	SETTINGS.RestoreDefaults();
-	ApplySettings(data);
+	LUA.pushfunction("LockMouse", [](lua_State* L) -> int
+		{
+			LockMouse(*window);
+			return 1;
+		});
+
+	LUA.pushfunction("UnlockMouse", [](lua_State* L) -> int
+		{
+			UnlockMouse(*window);
+			return 1;
+		});
+
+	LUA.pushfunction("GetFPS", [](lua_State* L) -> int
+		{
+			lua_pushnumber(L, smooth_fps);
+			return 1;
+		});
+
+	LUA.Clear();
 }

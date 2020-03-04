@@ -78,6 +78,7 @@ struct InputState
 	float axis_value[sf::Joystick::AxisCount] = { 0.f };
 	bool  buttons[sf::Joystick::ButtonCount] = { false };
 	bool  button_pressed[sf::Joystick::ButtonCount] = { false };
+	std::string text_input;
 
 	InputState();
 	InputState(bool keys[sf::Keyboard::KeyCount], bool mouse[3], sf::Vector2f mouse_pos, sf::Vector2f mouse_speed);
@@ -390,6 +391,43 @@ public:
 	std::wstring wait_text;
 };
 
+//text input
+class InputBox : public Box
+{
+public:
+	InputBox(float w, float h, sf::Color color_active = sf::Color::Blue, sf::Color color_hover = default_hover_main_color, sf::Color color_main = default_main_color);
+
+	InputBox(InputBox& A);
+	InputBox(InputBox&& A);
+
+	void operator=(InputBox& A);
+	void operator=(InputBox&& A);
+
+	void CreateCallbacks();
+
+	virtual Object* GetCopy();
+	virtual void* GetData();
+
+	std::string text;
+};
+
+class Slider : public Box
+{
+	float value;
+};
+
+class DropDownList : public Box
+{
+	int state;
+	std::map<int, std::string> list;
+	Box bropbox;
+};
+
+class CheckBox : public Box
+{
+	bool state;
+};
+
 template<class T>
 inline KeyMapper::KeyMapper(T label, T act_label, int * key, float w, float h, MapperType type, sf::Color color_active, sf::Color color_hover, sf::Color color_main): waiting(false), this_type(type), wait_text(act_label)
 {
@@ -405,6 +443,7 @@ inline KeyMapper::KeyMapper(T label, T act_label, int * key, float w, float h, M
 	this->AddObject(&RightBox, Allign::RIGHT);
 	key_ptr = key;
 	SetKeyString();
+	CreateCallbacks();
 }
 
 template<class T>

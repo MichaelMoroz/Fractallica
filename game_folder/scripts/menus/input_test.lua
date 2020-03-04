@@ -47,10 +47,13 @@ function OpenInputTest()
 	end
 	boxD:SetDefaultFunction(true, CD);
 	
+	local inbox = InputBox.new(280, 30);
+	
 	wind:AddObject(boxW, Allign.CENTER);
 	wind:AddObject(boxA, Allign.LEFT);
 	wind:AddObject(boxD, Allign.RIGHT);
 	wind:AddObject(boxS, Allign.CENTER);
+	wind:AddObject(inbox, Allign.CENTER);
 	
 	AddGlobalObject(wind);
 end;

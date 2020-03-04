@@ -540,10 +540,7 @@ void Object::UpdateAction(sf::RenderWindow * window, InputState & state)
 			}
 		}
 	}
-	else
-	{
-		action_time -= state.dt;
-	}
+	action_time -= state.dt;
 
 	//update callbacks for all functions inside
 	for (auto &obj : objects)
@@ -1410,4 +1407,87 @@ void KeyMapper::SetKeyString()
 Object * KeyMapper::GetCopy()
 {
 	return static_cast<Object*>(new KeyMapper(*this));
+}
+
+InputBox::InputBox(float w, float h, sf::Color color_active, sf::Color color_hover, sf::Color color_main)
+{
+	SetSize(w, h);
+	SetBackgroundColor(color_main);
+	activestate.color_main = color_active;
+	hoverstate.color_main = color_hover;
+
+	Text inpt("kek ", LOCAL("default"), h * 0.7f, sf::Color::White);
+
+	this->AddObject(&inpt, Allign::LEFT);
+	CreateCallbacks();
+}
+
+InputBox::InputBox(InputBox& A)
+{
+	*this = A;
+}
+
+InputBox::InputBox(InputBox&& A)
+{
+	*this = A;
+}
+
+void InputBox::operator=(InputBox& A)
+{
+	Box::operator=(A);
+	text = A.text;
+	CreateCallbacks();
+}
+
+void InputBox::operator=(InputBox&& A)
+{
+	Box::operator=(A);
+	std::swap(text, A.text);
+	CreateCallbacks();
+}
+
+void InputBox::CreateCallbacks()
+{
+	this->SetMainDefaultFunction([](sf::RenderWindow* window, InputState& state, Object* this_obj)
+		{
+			InputBox* this_box = ((InputBox*)this_obj);
+			if (state.text_input.size() > 0)
+			{
+				//add text
+			    this_box->text += state.text_input;
+			}
+
+			if (state.key_press[sf::Keyboard::BackSpace])
+			{
+				//remove last
+				for(int i = 0; i<2; i++)
+				  if (this_box->text.size() > 0)
+					this_box->text.pop_back();
+				this_obj->action_time = 0.; //reset timer
+			}
+			
+			//if the backspace is held for over 0.5s then delete more
+			if (state.keys[sf::Keyboard::BackSpace] && this_obj->action_time < -0.5)
+			{
+				for (int i = 0; i < 2; i++)
+					if (this_box->text.size() > 0)
+						this_box->text.pop_back();
+			}
+
+			//update the text inside
+			Text* this_text = (Text*)this_obj->objects[0].get();
+			std::string cursor = (int(state.time*3.f)%2 == 0) ? "" : "|";
+			this_text->SetString(this_box->text + cursor);
+
+		});
+}
+
+Object* InputBox::GetCopy()
+{
+	return static_cast<Object*>(new InputBox(*this));
+}
+
+void* InputBox::GetData()
+{
+	return nullptr;
 }

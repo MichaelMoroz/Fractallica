@@ -31,9 +31,10 @@ dofile( "scripts/gamemodes/free_cam.lua" );
 --Menus
 dofile( "scripts/menus/main_menu.lua" );
 dofile( "scripts/menus/input_test.lua" );
+dofile( "scripts/menus/debug.lua" );
 
 OpenMainMenu();
 OpenInputTest();
-
+OpenDebugInfo();
 --intialize the shader
 dofile( "scripts/compute/simple.lua" );

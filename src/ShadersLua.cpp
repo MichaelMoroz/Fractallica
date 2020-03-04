@@ -246,4 +246,6 @@ void WrapShaders(LuaVM* LVM)
 			glBindImageTexture(id, texid, 0, GL_FALSE, 0, RW, GL_RGBA32F);
 			return 1;
 		});
+
+	LUA.Clear();
 }

@@ -385,6 +385,8 @@ void WrapResources(LuaVM * LVM)
 		});
 	///the thing that links the metatable to the Object table
 	LUA.setvalue("__index", vec4id);
+
+	LUA.Clear();
 }
 
 void AddGlobalTexture(std::string name, sf::Texture* txt)

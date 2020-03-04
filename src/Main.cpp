@@ -28,8 +28,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR lpCmdLine, int nCmdShow) {
 #else
 int main(int argc, char *argv[]) {
 #endif
-	bool first_start = SETTINGS.Load(settings_bin);
-
 	//all of the fonts
 	Fonts fonts;
 	LOCAL.LoadLocalsFromFolder(local_folder, &fonts);
@@ -40,14 +38,11 @@ int main(int argc, char *argv[]) {
 	sf::Texture main_txt, screenshot_txt;
 	
 	sf::Clock clock;
-	float smooth_fps = target_fps;
-	float lag_ms = 0.0f;
-	mouse_pos = sf::Vector2i(0, 0);
-	mouse_prev_pos = sf::Vector2i(0, 0);
-  
-	SetPointers(&window, &main_txt, &screenshot_txt);
-	ApplySettings(nullptr);
+	
 
+	SetPointers(&window, &main_txt, &screenshot_txt);
+
+	InitializeWindow(false, 60.f);
 	window.requestFocus();
 	UpdateAspectRatio(window.getSize().x, window.getSize().y);
 	//set window icon
@@ -56,7 +51,6 @@ int main(int argc, char *argv[]) {
 	//window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
   
 	sf::View default_window_view = window.getDefaultView();
-
 
 	io_state.window_size = sf::Vector2f(window.getSize().x, window.getSize().y);
 	float prev_s = 0;
@@ -94,11 +88,11 @@ int main(int argc, char *argv[]) {
 		sf::Event event;
 		window.clear(sf::Color::White);
 		float mouse_wheel = 0.0f;
-		mouse_prev_pos = mouse_pos;
-		io_state.mouse_prev = sf::Vector2f(mouse_prev_pos.x, mouse_prev_pos.y);
+		io_state.mouse_prev = io_state.mouse_pos;
 		io_state.wheel = mouse_wheel;
 		io_state.mouse_press[2] = false;
 		io_state.mouse_press[0] = false;
+		io_state.text_input = "";
 		bool TOUCH_MODE = SETTINGS.stg.touch_mode;
 
 		for (int i = 0; i < n_touch; i++)
@@ -191,30 +185,21 @@ int main(int argc, char *argv[]) {
 					(abs(event.joystickMove.position) < SETTINGS.stg.gamepad_deadzone) ? 0.f : event.joystickMove.position;
 				io_state.axis_moved[event.joystickMove.axis] = true;
 				break;
+			case sf::Event::TextEntered:
+				io_state.text_input = event.text.unicode;
+				break;
 			case sf::Event::KeyPressed:
-				all_keys[keycode] = true;
 				io_state.isKeyPressed = true;
 				io_state.keys[keycode] = true;
 				io_state.key_press[keycode] = true;
-				if (keycode == sf::Keyboard::Escape)
-				{
-					if (game_mode == MAIN_MENU)
-					{
-						if (NumberOfObjects() < 2)
-							ConfirmExit();
-					}
-				}
 				break;
 			case sf::Event::KeyReleased:
 				if (event.key.code < 0 || event.key.code >= sf::Keyboard::KeyCount) { continue; }
-				all_keys[keycode] = false;
 				io_state.keys[keycode] = false;
 				break;
 			case sf::Event::MouseButtonPressed:
 				if (event.mouseButton.button == sf::Mouse::Left)
 				{
-					mouse_pos = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
-					mouse_clicked = true;
 					io_state.mouse[0] = true;
 					io_state.mouse_press[0] = true;
 				}
@@ -228,16 +213,13 @@ int main(int argc, char *argv[]) {
 				if (event.mouseButton.button == sf::Mouse::Left)
 				{
 					io_state.mouse[0] = false;
-					mouse_pos = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
-					mouse_clicked = false;
 				}
 				else if (event.mouseButton.button == sf::Mouse::Right) {
 					io_state.mouse[2] = false;
 				}
 				break;
 			case sf::Event::MouseMoved:
-				mouse_pos = sf::Vector2i(event.mouseMove.x, event.mouseMove.y);
-				io_state.mouse_pos = sf::Vector2f(mouse_pos.x, mouse_pos.y);
+				io_state.mouse_pos = sf::Vector2f(event.mouseMove.x, event.mouseMove.y);
 				break;
 			case sf::Event::MouseWheelScrolled:
 				mouse_wheel += event.mouseWheelScroll.delta;
@@ -262,45 +244,20 @@ int main(int argc, char *argv[]) {
 		}
 	
 		bool skip_frame = false;
-		if ((lag_ms >= 1000.0f / target_fps) && SETTINGS.stg.speed_regulation) {
+		if ((lag_ms >= 1000.0f / target_fps)) {
 			//If there is too much lag, just do another frame of physics and skip the draw
 			lag_ms -= 1000.0f / target_fps;
 			skip_frame = true;
 		}
 		else 
 		{
-			//Update the shader values
-			if (game_mode != FIRST_START)
-			{
-				if (!(taken_screenshot && SETTINGS.stg.screenshot_preview))
-				{
-					RunRenderScript();
-					window.resetGLStates();
-					//Draw render texture to main window
-					sf::Sprite sprite(main_txt);
-					sprite.setScale(float(window.getSize().x) / float(main_txt.getSize().x),
-						float(window.getSize().y) / float(main_txt.getSize().y));
-					window.draw(sprite);
-				}
-				else
-				{
-					//Draw screenshot preview
-					sf::Sprite sprite(screenshot_txt);
-					sf::Vector2u ssize = screenshot_txt.getSize();
-					float scale = min(float(window.getSize().x) / float(ssize.x),
-						float(window.getSize().y) / float(ssize.y));
-					vec2 pos = vec2(window.getSize().x - ssize.x*scale, window.getSize().y - ssize.y*scale)*0.5f;
-					sprite.setScale(scale, scale);
-					sprite.setPosition(pos.x, pos.y);
-					window.draw(sprite);
-
-					const float s = screenshot_clock.getElapsedTime().asSeconds();
-					if (s > SETTINGS.stg.preview_time)
-					{
-						taken_screenshot = false;
-					}
-				}
-			}
+			RunRenderScript();
+			window.resetGLStates();
+			//Draw render texture to main window
+			sf::Sprite sprite(main_txt);
+			sprite.setScale(float(window.getSize().x) / float(main_txt.getSize().x),
+				float(window.getSize().y) / float(main_txt.getSize().y));
+			window.draw(sprite);
 		}
 
 		//new interface render stuff
@@ -317,10 +274,7 @@ int main(int argc, char *argv[]) {
 				{
 					window.draw(touch_circle[i]);
 				}
-				if (game_mode == PLAYING || game_mode == CREDITS || game_mode == MIDPOINT || game_mode == LEVEL_EDITOR)
-				{
-					window.draw(joystick);
-		    	}
+				window.draw(joystick);
 			}
 
 			window.display();

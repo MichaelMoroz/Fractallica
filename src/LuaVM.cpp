@@ -142,6 +142,11 @@ void LuaVM::setlightuserdata(std::string name, void* var)
 	lua_settable(L, -3);
 }
 
+void LuaVM::Clear()
+{
+	lua_settop(L, 0);
+}
+
 LuaVM::~LuaVM()
 {
 	lua_close(L);
