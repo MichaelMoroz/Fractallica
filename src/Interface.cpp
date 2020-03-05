@@ -980,6 +980,12 @@ void Window::CreateCallbacks()
 	}, false);
 }
 
+void Window::AddCloseCallback(call_func cf)
+{
+	//callback function on the close button
+	this->objects[0].get()->objects[1].get()->SetCallbackFunction(cf);
+}
+
 void Window::operator=(Window & A)
 {
 	Box::operator=(A);
@@ -1439,14 +1445,14 @@ InputBox::InputBox(InputBox&& A)
 void InputBox::operator=(InputBox& A)
 {
 	Box::operator=(A);
-	text = A.text;
+	textstr = A.textstr;
 	CreateCallbacks();
 }
 
 void InputBox::operator=(InputBox&& A)
 {
 	Box::operator=(A);
-	std::swap(text, A.text);
+	std::swap(textstr, A.textstr);
 	CreateCallbacks();
 }
 
@@ -1458,15 +1464,15 @@ void InputBox::CreateCallbacks()
 			if (state.text_input.size() > 0)
 			{
 				//add text
-			    this_box->text += state.text_input;
+			    this_box->textstr += state.text_input;
 			}
 
 			if (state.key_press[sf::Keyboard::BackSpace])
 			{
 				//remove last
 				for(int i = 0; i<2; i++)
-				  if (this_box->text.size() > 0)
-					this_box->text.pop_back();
+				  if (this_box->textstr.size() > 0)
+					this_box->textstr.pop_back();
 				this_obj->action_time = 0.; //reset timer
 			}
 			
@@ -1474,14 +1480,14 @@ void InputBox::CreateCallbacks()
 			if (state.keys[sf::Keyboard::BackSpace] && this_obj->action_time < -0.5)
 			{
 				for (int i = 0; i < 2; i++)
-					if (this_box->text.size() > 0)
-						this_box->text.pop_back();
+					if (this_box->textstr.size() > 0)
+						this_box->textstr.pop_back();
 			}
 
 			//update the text inside
 			Text* this_text = (Text*)this_obj->objects[0].get();
 			std::string cursor = (int(state.time*3.f)%2 == 0) ? "" : "|";
-			this_text->SetString(this_box->text + cursor);
+			this_text->SetString(this_box->textstr + cursor);
 
 		});
 }
@@ -1494,6 +1500,11 @@ Object* InputBox::GetCopy()
 void* InputBox::GetData()
 {
 	return nullptr;
+}
+
+std::string InputBox::GetText()
+{
+	return textstr;
 }
 
 Slider::Slider(float w, float h, float val, float min, float max, float dv)

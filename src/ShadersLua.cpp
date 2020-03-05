@@ -130,6 +130,38 @@ void WrapShaders(LuaVM* LVM)
 			return 1;
 		});
 
+	LUA.setfunction("setFOV", [](lua_State* L) -> int
+		{
+			Camera* obj = (Camera*)lua_touserdata(L, -2);
+			float nx = lua_tonumber(L, -1);
+			obj->SetFOV(nx);
+			return 1;
+		});
+
+	LUA.setfunction("setCameraSize", [](lua_State* L) -> int
+		{
+			Camera* obj = (Camera*)lua_touserdata(L, -2);
+			float nx = lua_tonumber(L, -1);
+			obj->SetCameraSize(nx);
+			return 1;
+		});
+
+	LUA.setfunction("updateExposure", [](lua_State* L) -> int
+		{
+			Camera* obj = (Camera*)lua_touserdata(L, -2);
+			float nx = lua_tonumber(L, -1);
+			obj->UpdateExposure(nx);
+			return 1;
+		});
+
+	LUA.setfunction("setSmoothness", [](lua_State* L) -> int
+		{
+			Camera* obj = (Camera*)lua_touserdata(L, -2);
+			float nx = lua_tonumber(L, -1);
+			obj->SetSmoothness(nx);
+			return 1;
+		});
+
 	LUA.setfunction("setRotation", [](lua_State* L) -> int
 		{
 			Camera* obj = (Camera*)lua_touserdata(L, -4);

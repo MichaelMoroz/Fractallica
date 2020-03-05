@@ -359,3 +359,19 @@ GLuint Renderer::GenerateTexture(float w, float h)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	return texture;
 }
+
+
+float GetAvgIllumination(sf::Texture* txt)
+{
+	glBindTexture(GL_TEXTURE_2D, txt->getNativeHandle());
+	
+	//get the average of the texture using mipmaps
+	float avg[4];
+	int mipmap_level = floor(log2(float(std::max(txt->getSize().x, txt->getSize().y))));
+	glGenerateMipmap(GL_TEXTURE_2D);
+	glGetTexImage(GL_TEXTURE_2D, mipmap_level, GL_RGBA, GL_FLOAT, avg);
+	GLenum err = glGetError();
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	return sqrt(avg[0] * avg[0] + avg[1] * avg[1] + avg[2] * avg[2]);
+}

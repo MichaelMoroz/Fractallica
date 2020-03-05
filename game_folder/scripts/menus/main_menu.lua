@@ -1,3 +1,5 @@
+clicksound = Sound.new("sound/fx/menu_click.wav")
+clicksound:SetVolume(50);
 function OpenMainMenu()
 	CURRENT_MODE = GAME_MODES.MENU;
 
@@ -18,11 +20,13 @@ function OpenMainMenu()
 	local version = Text.new("Alpha " .. GetVersion(), 40);
 
 	function exitcallback(object)
+		clicksound:Play();
 		CloseFractallica();
 	end;
 	local exitbtn = Button.new("Exit", 600, 50, exitcallback);
 
 	function freecam(object)
+		clicksound:Play();
 		Free_Camera_Mode();
 	end;
 	local fcbtn = Button.new("Free camera mode", 600, 50, freecam);

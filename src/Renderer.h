@@ -3,6 +3,8 @@
 #include<Shaders.h>
 #include<ExprParser.h>
 
+float GetAvgIllumination(sf::Texture * txt);
+
 class Renderer
 {
 public:
@@ -49,3 +51,5 @@ private:
 	GLuint illumination_texture;
 	ComputeShader weight_shader;
 };
+
+

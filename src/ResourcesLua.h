@@ -17,3 +17,16 @@ void AddGlobalTexture(std::string name, sf::Texture* txt);
 void PushVector(vec2 a);
 void PushVector(vec3 a);
 void PushVector(vec4 a);
+
+class Sound
+{
+public:
+	Sound(std::string fname);
+	void Play();
+	void SetVolume(float v);
+	void SetPosition(float x, float y, float z);
+	void SetAttenuation(float a);
+	
+	sf::Sound sound;
+	sf::SoundBuffer buff;
+};

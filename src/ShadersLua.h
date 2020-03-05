@@ -10,6 +10,7 @@
 #include <new>
 #include <LuaVM.h>
 #include <Shaders.h>
+#include <Renderer.h>
 #include <Interface.h>
 #include <Gamemodes.h>
 

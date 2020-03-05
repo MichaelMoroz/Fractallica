@@ -11,6 +11,10 @@ function tostringp(num, p)
 	return tostring(p*math.floor(num/p+0.5));
 end;
 
+function mod(x, y)
+	return  a - math.floor(a/b)*b;
+end;
+
 
 Color = {
 		Black = vec4.new(0,0,0,1),

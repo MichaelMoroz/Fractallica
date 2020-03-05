@@ -387,6 +387,58 @@ void WrapResources(LuaVM * LVM)
 	LUA.setvalue("__index", vec4id);
 
 	LUA.Clear();
+
+	int soundid = LUA.newtable("Sound");
+	LUA.setfunction("new", [](lua_State* L) -> int
+		{
+			std::string fname = lua_tostring(L, -1);
+			Sound** newobj = static_cast<Sound**>(lua_newuserdata(L, sizeof(void*)));
+			*newobj = new Sound(fname);
+			luaL_getmetatable(L, "SoundMetaTable");
+			lua_setmetatable(L, -2);
+			return 1;
+		});
+	LUA.setfunction("Play", [](lua_State* L) -> int
+		{
+			Sound* obj = *(Sound**)lua_touserdata(L, -1);
+			obj->Play();
+			return 1;
+		});
+	LUA.setfunction("SetVolume", [](lua_State* L) -> int
+		{
+			Sound* obj = *(Sound**)lua_touserdata(L, -2);
+			float x = lua_tonumber(L, -1);
+			obj->SetVolume(x);
+			return 1;
+		});
+	LUA.setfunction("SetAttenuation", [](lua_State* L) -> int
+		{
+			Sound* obj = *(Sound**)lua_touserdata(L, -2);
+			float x = lua_tonumber(L, -1);
+			obj->SetAttenuation(x);
+			return 1;
+		});
+	LUA.setfunction("SetPosition", [](lua_State* L) -> int
+		{
+			Sound* obj = *(Sound**)lua_touserdata(L, -2);
+			float x = lua_tonumber(L, -1);
+			float y = lua_tonumber(L, -2);
+			float z = lua_tonumber(L, -3);
+			obj->SetPosition(x,y,z);
+			return 1;
+		});
+
+	LUA.newmetatable("SoundMetaTable");
+	///object destructor
+	LUA.setfunction("__gc", [](lua_State* L) -> int
+		{
+			Sound* obj = *(Sound**)lua_touserdata(L, -1);
+			obj->~Sound();
+			return 0;
+		});
+
+	///the thing that links the metatable to the Object table
+	LUA.setvalue("__index", soundid);
 }
 
 void AddGlobalTexture(std::string name, sf::Texture* txt)
@@ -410,4 +462,30 @@ void PushVector(vec4 a)
 {
 	vec4* nvec = new vec4(a);
 	LUA.newuserdatafrom(nvec, "vec4");
+}
+
+Sound::Sound(std::string fname)
+{
+	buff.loadFromFile(fname);
+	sound.setBuffer(buff);
+}
+
+void Sound::Play()
+{
+	sound.play();
+}
+
+void Sound::SetVolume(float v)
+{
+	sound.setVolume(v);
+}
+
+void Sound::SetPosition(float x, float y, float z)
+{
+	sound.setPosition(sf::Vector3f(x,y,z));
+}
+
+void Sound::SetAttenuation(float a)
+{
+	sound.setAttenuation(a);
 }

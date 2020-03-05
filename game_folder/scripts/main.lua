@@ -27,6 +27,7 @@ frame = 0;
 camera = Camera.new();
 camera:setPosition(-10, 0, 0);
 camera:SetExposure(0.5);
+camera:setFOV(70);
 camera:SetResolution(render.width, render.height);
 
 GAME_MODES = {MENU = 0, FREE_CAMERA = 1};

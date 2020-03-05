@@ -293,6 +293,7 @@ public:
 	Window(Window&& A);
 
 	void CreateCallbacks();
+	void AddCloseCallback(call_func cf);
 
 	void operator=(Window& A);
 	void operator=(Window&& A);
@@ -409,7 +410,9 @@ public:
 	virtual Object* GetCopy();
 	virtual void* GetData();
 
-	std::string text;
+	std::string GetText();
+
+	std::string textstr;
 };
 
 class Slider : public Box

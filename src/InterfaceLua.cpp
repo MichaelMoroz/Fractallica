@@ -98,6 +98,13 @@ void WrapInterface(LuaVM* LVM)
 			return 1;
 		});
 
+	LUA.setfunction("GetText", [](lua_State* L) -> int
+		{
+			InputBox* obj = *(InputBox**)lua_touserdata(L, -1);
+			lua_pushstring(L, obj->GetText().c_str());
+			return 1;
+		});
+
 	LUA.newmetatable("ObjectMetaTable");
 	///object destructor
 	LUA.setfunction("__gc", [](lua_State* L) -> int
@@ -250,6 +257,13 @@ void WrapInterface(LuaVM* LVM)
 			*newobj = new Window(X, Y, dX, dY, default_main_color, LOCAL[text]);
 			luaL_getmetatable(L, "WindowMetaTable");
 			lua_setmetatable(L, -2);
+			return 1;
+		});
+	LUA.setfunction("AddCloseCallback", [](lua_State* L) -> int
+		{
+			Window* obj = *(Window**)lua_touserdata(L, -2);
+			call_func c = GetLuaCallbackFunction(L);
+			obj->AddCloseCallback(c);
 			return 1;
 		});
 	//inheritance of Box methods
