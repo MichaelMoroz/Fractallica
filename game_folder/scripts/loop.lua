@@ -5,7 +5,7 @@
 
 if(CURRENT_MODE == GAME_MODES.MENU) then
 	camera:setPosition(0., 0., -7.);
-	camera:RotateX(0.0001*math.sin(frame/60));
+	camera:RotateX(0.000*math.sin(frame/60));
 else
 	Free_Camera_Update();
 end;

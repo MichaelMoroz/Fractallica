@@ -9,6 +9,7 @@ std::map<int, bool> active;
 int focused = 0;
 int cursor = 0;
 int global_focus = 0;
+bool gui_activated = false;
 
 sf::Color default_main_color = sf::Color(64, 64, 64, 128);
 sf::Color default_hover_main_color = sf::Color(200, 128, 128, 128);
@@ -197,6 +198,7 @@ std::string key_name(sf::Keyboard::Key & key)
 
 void UpdateAllObjects(sf::RenderWindow * window, InputState& state)
 {
+	gui_activated = false;
 	for (auto &id : del)
 	{
 		RemoveGlobalObject(id);
@@ -223,7 +225,6 @@ void UpdateAllObjects(sf::RenderWindow * window, InputState& state)
 			}
 		}
 	}
-	
 	//render stuff in the following order
 	for (auto &z : z_value)
 	{
@@ -231,7 +232,7 @@ void UpdateAllObjects(sf::RenderWindow * window, InputState& state)
 		{
 			global_objects[z].get()->used_view = default_view;
 			global_objects[z].get()->Update(window, state);
-			global_objects[z].get()->UpdateAction(window, state);
+			gui_activated = global_objects[z].get()->UpdateAction(window, state)||gui_activated;
 		}
 	}	
 }
@@ -494,8 +495,9 @@ void Object::Update(sf::RenderWindow * window, InputState& state)
 	Draw(window, state);
 }
 
-void Object::UpdateAction(sf::RenderWindow * window, InputState & state)
+bool Object::UpdateAction(sf::RenderWindow * window, InputState & state)
 {
+	bool activated = false;
 	state.mouse_speed = window->mapPixelToCoords(sf::Vector2i(state.mouse_pos.x, state.mouse_pos.y)) -
 						window->mapPixelToCoords(sf::Vector2i(state.mouse_prev.x, state.mouse_prev.y));
 
@@ -523,6 +525,7 @@ void Object::UpdateAction(sf::RenderWindow * window, InputState & state)
 		for (auto &this_callback : callback)
 		{
 			this_callback(window, state, this); //run callback with state info
+			activated = true;
 		}
 		curmode = ACTIVE;
 	}
@@ -542,8 +545,9 @@ void Object::UpdateAction(sf::RenderWindow * window, InputState & state)
 	//update callbacks for all functions inside
 	for (auto &obj : objects)
 	{
-		obj.get()->UpdateAction(window, state);
+		activated =(obj.get()->UpdateAction(window, state))|| activated ;
 	}
+	return activated;
 }
 
 
@@ -1507,8 +1511,8 @@ Slider::Slider(float w, float h, float val, float min, float max, float dv)
 	vals.SetBackgroundColor(sf::Color::Blue);
 	vals.SetPosition(w * 0.5 - h * 0.4, -1.f);
 
-	this->AddObject(&pull, Allign::FREE);
 	this->AddObject(&vals, Allign::FREE);
+	this->AddObject(&pull, Allign::FREE);
 	CreateCallbacks();
 }
 
@@ -1545,18 +1549,7 @@ void Slider::operator=(Slider&& A)
 
 void Slider::CreateCallbacks()
 {
-	//slider thing
-	this->objects[1].get()->SetMainCallbackFunction([parent = this](sf::RenderWindow * window, InputState & state, Object* this_obj)
-		{
-			sf::Vector2f sz0 = parent->curstate.size;
-			sf::Vector2f sz1 = this_obj->curstate.size;
-			sf::Vector2f ps1 = this_obj->defaultstate.position;
-			float newx = std::min(std::max(ps1.x + state.mouse_speed.x, 0.f), sz0.x - sz1.x);
-			float newy = ps1.y;
-			this_obj->SetPosition(newx, newy);
-		}, false);
-
-	//pull thing
+	/*//slider thing
 	this->objects[0].get()->SetMainCallbackFunction([parent = this](sf::RenderWindow * window, InputState & state, Object* this_obj)
 		{
 			sf::Vector2f sz0 = parent->curstate.size;
@@ -1564,11 +1557,44 @@ void Slider::CreateCallbacks()
 			sf::Vector2f ps1 = this_obj->defaultstate.position;
 			float newx = std::min(std::max(ps1.x + state.mouse_speed.x, 0.f), sz0.x - sz1.x);
 			float newy = ps1.y;
+			parent->value = (parent->max_val - parent->min_val) * newx / (sz0.x - sz1.x) + parent->min_val;
+			this_obj->SetPosition(newx, newy);
+		}, false);*/
+
+	this->objects[0].get()->SetMainDefaultFunction([parent = this](sf::RenderWindow* window, InputState& state, Object* this_obj)
+		{
+			sf::Vector2f sz0 = parent->curstate.size;
+			sf::Vector2f sz1 = this_obj->curstate.size;
+			sf::Vector2f ps1 = this_obj->defaultstate.position;
+			if (!state.mouse[0])
+			{
+				float posx = (sz0.x - sz1.x) * (parent->GetValue() - parent->min_val) / (parent->max_val - parent->min_val);
+				this_obj->SetPosition(posx, sz0.y * 0.5 - sz1.y * 0.5 - 1.f);
+			}
+			else
+			{
+				float posx = (sz0.x - sz1.x) * (parent->value - parent->min_val) / (parent->max_val - parent->min_val);
+				this_obj->SetPosition(posx, sz0.y * 0.5 - sz1.y * 0.5 - 1.f);
+			}
+		}, true);
+
+	//pull thing
+	this->objects[1].get()->SetMainCallbackFunction([parent = this](sf::RenderWindow * window, InputState & state, Object* this_obj)
+		{
+			sf::Vector2f sz0 = parent->curstate.size;
+			sf::Vector2f sz1 = this_obj->curstate.size;
+			sf::Vector2f ps1 = this_obj->defaultstate.position;
+			float newx = std::min(std::max(ps1.x + state.mouse_speed.x, 0.f), sz0.x - sz1.x);
+			float newy = ps1.y;
+
+			float dv = 0.25f*(newx - (sz0.x - sz1.x)*0.5) / (sz0.x - sz1.x);
+			parent->value = std::max(std::min(parent->value + (parent->max_val - parent->min_val)*dv*abs(dv), parent->max_val), parent->min_val);
+
 			this_obj->SetPosition(newx, newy);
 			
 		}, false);
 
-	this->objects[0].get()->SetMainDefaultFunction([parent = this](sf::RenderWindow * window, InputState & state, Object* this_obj)
+	this->objects[1].get()->SetMainDefaultFunction([parent = this](sf::RenderWindow * window, InputState & state, Object* this_obj)
 		{
 			sf::Vector2f sz0 = parent->curstate.size;
 			sf::Vector2f sz1 = this_obj->curstate.size;

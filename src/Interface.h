@@ -25,6 +25,7 @@ extern sf::Color default_active_main_color;
 extern float default_margin;
 extern sf::Vector2f default_size;
 extern sf::View default_view;
+extern bool gui_activated;
 
 extern float animation_sharpness;
 extern float action_dt;
@@ -158,7 +159,7 @@ public:
 	virtual void* GetData();
 
 	void Update(sf::RenderWindow * window, InputState& state);
-	void UpdateAction(sf::RenderWindow * window, InputState& state);
+	bool UpdateAction(sf::RenderWindow * window, InputState& state);
 	
 	Object();
 

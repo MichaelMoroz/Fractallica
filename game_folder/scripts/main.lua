@@ -16,6 +16,12 @@ InitializeRenderTextures(render.width, render.height, render.width, render.heigh
 --used localization file
 SetLanguage("English");
 
+fractal = {Scale = 1.93, Angle1 = 1.34637, Angle2 = 1.58,
+		   ShiftX = -2.31, ShiftY = 1.123, ShiftZ = 1.56};
+		   
+fractal_rng = {Scale = {0, 2.}, Angle1 = {0, 2.*math.pi}, Angle2 = {0, 2.*math.pi},
+		   ShiftX = {-5., 5.}, ShiftY = {-5., 5.}, ShiftZ = {-5., 5.}};
+
 frame = 0;
 camera = Camera.new();
 camera:setPosition(-10, 0, 0);
@@ -34,7 +40,7 @@ dofile( "scripts/menus/input_test.lua" );
 dofile( "scripts/menus/debug.lua" );
 
 OpenMainMenu();
-OpenInputTest();
 OpenDebugInfo();
+FractalEditor();
 --intialize the shader
 dofile( "scripts/compute/simple.lua" );

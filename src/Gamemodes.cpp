@@ -314,5 +314,11 @@ void GameOpLua()
 			return 1;
 		});
 
+	LUA.pushfunction("isGUIactive", [](lua_State* L) -> int
+		{
+			lua_pushboolean(L, gui_activated);
+			return 1;
+		});
+
 	LUA.Clear();
 }

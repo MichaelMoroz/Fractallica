@@ -22,7 +22,7 @@ HDR_prev = Texture32f.new(render.width,render.height);
 function ApplyDefaultParams(shader)
 	shader:setFloat("iFracScale",1.93);
 	shader:setFloat("iFracAng1", 1.34637);
-	shader:setFloat("iFracAng2",1.58);
+	shader:setFloat("iFracAng2", 1.58);
 	shader:setVec3("iFracShift", -2.31, 1.123, 1.56);
 	shader:setVec3("iFracCol", 0.42, 0.38, 0.19);
 	shader:setVec3("iMarblePos", -1.71412, 1.84836, -1.70884);
@@ -47,7 +47,10 @@ end;
 function ApplyParams(shader)
 	shader:setCameraObj("Camera", camera);
 	shader:setInt("iFrame", frame);
-	shader:setFloat("iFracAng1", 3.*math.sin(frame/1000));
+	shader:setFloat("iFracScale", fractal.Scale);
+	shader:setFloat("iFracAng1", fractal.Angle1);
+	shader:setFloat("iFracAng2", fractal.Angle2);
+	shader:setVec3("iFracShift", fractal.ShiftX, fractal.ShiftY, fractal.ShiftZ);
 end;
 
 ApplyDefaultParams(MRRM1);

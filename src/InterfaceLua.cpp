@@ -91,6 +91,13 @@ void WrapInterface(LuaVM* LVM)
 			return 1;
 		});
 
+	LUA.setfunction("GetValue", [](lua_State* L) -> int
+		{
+			Slider* obj = *(Slider**)lua_touserdata(L, -1);
+			lua_pushnumber(L, obj->GetValue());			
+			return 1;
+		});
+
 	LUA.newmetatable("ObjectMetaTable");
 	///object destructor
 	LUA.setfunction("__gc", [](lua_State* L) -> int

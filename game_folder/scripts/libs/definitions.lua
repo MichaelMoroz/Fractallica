@@ -7,6 +7,11 @@ GL_READ_WRITE = 0x88BA;
 
 interface_size = {x = 1920, y = 1080};
 
+function tostringp(num, p)
+	return tostring(p*math.floor(num/p+0.5));
+end;
+
+
 Color = {
 		Black = vec4.new(0,0,0,1),
 		White = vec4.new(1,1,1,1),

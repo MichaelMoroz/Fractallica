@@ -48,7 +48,7 @@ function OpenInputTest()
 	boxD:SetDefaultFunction(true, CD);
 	
 	local inbox = InputBox.new(280, 30);
-	local slid = Slider.new(280, 30, 5, 1, 0, 10);
+	local slid = Slider.new(280, 30, 5, 0, 10, 0);
 	
 	local margin = Box.new(200, 5);
 	margin:SetBackgroundColor(Color.Transparent);
