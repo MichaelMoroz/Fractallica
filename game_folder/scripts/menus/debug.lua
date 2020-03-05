@@ -1,6 +1,6 @@
 
 function OpenDebugInfo()
-	local wind0 = Window.new(450, 450, 500, 500, "Debug");
+	local wind0 = Window.new(interface_size.x - 500, 700, 500, 500, "Debug");
 
 	local framename = Text.new("Frame:", 30);
 	local frametxt = Text.new("", 30);

@@ -37,7 +37,7 @@ end;
 
 
 function FractalEditor()
-	local wind = Window.new(400, 400, 600, 400, "Fractal parameters");
+	local wind = Window.new(interface_size.x - 600, 0, 600, 400, "Fractal parameters");
 	
 	local margin = Box.new(600, 15);
 	margin:SetBackgroundColor(Color.Transparent);
@@ -47,7 +47,7 @@ function FractalEditor()
 	wind:AddObject(fname0, Allign.LEFT);
 	wind:AddObject(inbox, Allign.RIGHT);
 	wind:AddObject(margin, Allign.CENTER);
-	for k, v in pairs(fractal) do
+	for k, v in orderedPairs(fractal) do
 		local fname = Text.new(k, 30);
 		local val = Text.new("", 30);
 		local slid = Slider.new(280, 30, fractal[k], fractal_rng[k][1], fractal_rng[k][2], 0.);

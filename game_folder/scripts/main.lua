@@ -5,6 +5,7 @@
 --Load the table saving library
 dofile( "scripts/libs/table.save-1.0.lua" );
 dofile( "scripts/libs/definitions.lua" );
+dofile( "scripts/libs/ordered_pairs.lua" );
 
 render = {width = 960, height = 480};
 
