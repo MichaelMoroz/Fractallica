@@ -231,6 +231,7 @@ void scene_material(vec3 pos, inout vec4 color, inout vec2 pbr, inout vec3 emiss
 //A faster formula to find the gradient/normal direction of the DE
 //credit to http://www.iquilezles.org/www/articles/normalsSDF/normalsSDF.htm
 vec4 calcNormal(vec3 p, float dx) {
+	dx *= NORMAL_SMOOTH;
 	const vec3 k = vec3(1,-1,0);
 	return   (k.xyyx*DE(p + k.xyy*dx) +
 			 k.yyxx*DE(p + k.yyx*dx) +

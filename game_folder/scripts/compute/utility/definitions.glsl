@@ -14,6 +14,7 @@
 #define MAX_MARCHES 256
 #define NORMARCHES 3
 #define overrelax 1.25
+#define NORMAL_SMOOTH 2.
 
 //world
 
@@ -24,6 +25,7 @@
 #define LIGHT_FIELD_DENOISE
 //and make this 0.0001
 #define TXAAstr 0.4
+#define PIXEL_GITTER 0.0
 
 
 //ambient occlusion

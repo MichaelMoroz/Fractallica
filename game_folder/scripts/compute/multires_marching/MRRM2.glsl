@@ -34,7 +34,7 @@ void main() {
 	#endif
 	
 	vec2 uv = vec2(global_pos)/img_size;
-	ray rr = get_ray(uv, 1.);
+	ray rr = get_ray(uv, PIXEL_GITTER);
 	vec4 pos = vec4(rr.pos,0);
 	vec4 dir = vec4(rr.dir,0);
 	vec4 var = imageLoad(var_input, prev_pos);

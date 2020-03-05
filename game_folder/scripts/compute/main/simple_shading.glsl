@@ -23,8 +23,9 @@ void main() {
 	
 	vec2 img_size = vec2(imageSize(DE_input));
 	vec4 sph = imageLoad(DE_input, global_pos);
+	vec2 uv = vec2(global_pos)/img_size;
 	
-	ray rr = get_ray(vec2(global_pos)/img_size);
+	ray rr = get_ray(uv, PIXEL_GITTER);
 	vec4 pos = vec4(rr.pos,0);
 	vec4 dir = vec4(rr.dir,0);
 	vec4 var = vec4(0);
@@ -43,7 +44,7 @@ void main() {
 		vec3 cpos = pos.xyz - norm.w*norm.xyz;
 		vec2 pbr; vec3 emission;
 		scene_material(cpos, color, pbr, emission);
-		color *= max(dot(normalize(LIGHT_DIRECTION),norm.xyz),0.05);
+		color *= 0.5*dot(normalize(LIGHT_DIRECTION),norm.xyz) + 0.5;
 		color.xyz += emission;
 	}
 	else
