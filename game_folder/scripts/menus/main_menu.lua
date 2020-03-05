@@ -1,10 +1,13 @@
 function OpenMainMenu()
 	CURRENT_MODE = GAME_MODES.MENU;
-	
+
+	camera:setPosition(-10, 0, 0);
+	camera:setRotation(0, 0, 0);
+
 	RemoveAllObjects();
 	--all objects here are local, thus are destroyed after this function ends
 	local mainmenu = MenuBox.new(1000,800);
-	mainmenu:SetStatic(); --unchanging render order 
+	mainmenu:SetStatic(); --unchanging render order
 	mainmenu:SetPosition(0.025*interface_size.x,0.025*interface_size.y);
 
 	local margin = Box.new(1000*0.9, 5);
@@ -13,24 +16,24 @@ function OpenMainMenu()
 	title:SetBorderColor(Color.Black);
 	title:SetBorderWidth(4);
 	local version = Text.new("Alpha " .. GetVersion(), 40);
-	
+
 	function exitcallback(object)
 		CloseFractallica();
 	end;
 	local exitbtn = Button.new("Exit", 600, 50, exitcallback);
-	
+
 	function freecam(object)
 		Free_Camera_Mode();
 	end;
 	local fcbtn = Button.new("Free camera mode", 600, 50, freecam);
-	
+
 	mainmenu:AddObject(title, Allign.LEFT);
 	mainmenu:AddObject(margin, Allign.CENTER);
 	mainmenu:AddObject(version, Allign.LEFT);
 	mainmenu:AddObject(margin, Allign.CENTER);
 	mainmenu:AddObject(fcbtn, Allign.LEFT);
 	mainmenu:AddObject(exitbtn, Allign.LEFT);
-	
+
 	--add a copy of the mainmenu object to the global render/update list
 	AddGlobalObject(mainmenu);
 end;
@@ -38,10 +41,10 @@ end;
 
 function FractalEditor()
 	local wind = Window.new(interface_size.x - 600, 0, 600, 400, "Fractal parameters");
-	
+
 	local margin = Box.new(600, 15);
 	margin:SetBackgroundColor(Color.Transparent);
-	
+
 	local fname0 = Text.new("Just a text input", 30);
 	local inbox = InputBox.new(300, 35);
 	wind:AddObject(fname0, Allign.LEFT);
@@ -64,6 +67,6 @@ function FractalEditor()
 		wind:AddObject(val, Allign.RIGHT);
 		wind:AddObject(margin, Allign.CENTER);
 	end
-	
+
 	AddGlobalObject(wind);
 end;
