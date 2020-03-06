@@ -1,6 +1,7 @@
 #include <Interface.h>
 
 std::map<int, std::unique_ptr<Object>> global_objects;
+std::map<std::string, bool> unique_object;
 std::vector<int> z_value; //rendering order
 std::map<int, int> z_index;
 std::vector<int> del; // deletion stack
@@ -85,13 +86,17 @@ void UpdateAspectRatio(float width, float heigth)
 
 int AddGlobalObject(Object & a)
 {
-	Object* copy = a.GetCopy();
-	global_objects[copy->id] = std::unique_ptr<Object>(copy);//add a copy to the global list
-	global_objects[copy->id].get()->id = copy->id;
-	z_value.push_back(copy->id);
-	global_focus = copy->id;
-	focused = copy->id;
-	return copy->id;  
+	if (a.isCopyable())
+	{
+		Object* copy = a.GetCopy();
+		global_objects[copy->id] = std::unique_ptr<Object>(copy);//add a copy to the global list
+		global_objects[copy->id].get()->id = copy->id;
+		z_value.push_back(copy->id);
+		global_focus = copy->id;
+		focused = copy->id;
+		return copy->id;
+	}
+	return a.id;
 }
 
 bool global_exists(int id)
@@ -232,9 +237,17 @@ void UpdateAllObjects(sf::RenderWindow * window, InputState& state)
 		{
 			global_objects[z].get()->used_view = default_view;
 			global_objects[z].get()->Update(window, state);
-			gui_activated = global_objects[z].get()->UpdateAction(window, state)||gui_activated;
 		}
 	}	
+
+	//update in reverse order
+	for (int i = z_value.size()-1; i>=0; i--)
+	{
+		if (global_objects.count(z_value[i]) != 0)
+		{
+			gui_activated = gui_activated || global_objects[z_value[i]].get()->UpdateAction(window, state);
+		}
+	}
 }
 
 
@@ -439,6 +452,15 @@ bool Object::RunCallback(sf::RenderWindow * window, InputState & state)
 	}
 }
 
+bool Object::RunDefaultCallback(sf::RenderWindow* window, InputState& state)
+{
+	for (int i = 0; i < defaultfn.size(); i++)
+	{
+		defaultfn[i](window, state, this); //run callback with state info
+	}
+	return true;
+}
+
 void Object::clone_states()
 {
 	curstate = defaultstate;
@@ -451,11 +473,10 @@ void Object::Update(sf::RenderWindow * window, InputState& state)
 	worldPos = window->mapPixelToCoords(sf::Vector2i(state.mouse_pos.x, state.mouse_pos.y));
 	obj= sf::FloatRect(curstate.position.x, curstate.position.y, curstate.size.x, curstate.size.y);
 
-	window->setView(used_view);
 	state.mouse_speed = window->mapPixelToCoords(sf::Vector2i(state.mouse_pos.x, state.mouse_pos.y)) -
-						window->mapPixelToCoords(sf::Vector2i(state.mouse_prev.x, state.mouse_prev.y));
+		window->mapPixelToCoords(sf::Vector2i(state.mouse_prev.x, state.mouse_prev.y));
 
-	if ( ((state.mouse[0] || state.mouse[2]) && !limiter) || ((state.mouse_press[0] || state.mouse_press[2]) && limiter) ) //if clicked
+	if (((state.mouse[0] || state.mouse[2]) && !limiter) || ((state.mouse_press[0] || state.mouse_press[2]) && limiter)) //if clicked
 	{
 		if (obj.contains(worldPos)) // if inside object
 		{
@@ -474,7 +495,8 @@ void Object::Update(sf::RenderWindow * window, InputState& state)
 	{
 		active[id] = false; //deactivate
 	}
-	
+
+	window->setView(used_view);
 
 	float t = 1.f - exp(-animation_sharpness * state.dt);
 
@@ -498,10 +520,9 @@ void Object::Update(sf::RenderWindow * window, InputState& state)
 bool Object::UpdateAction(sf::RenderWindow * window, InputState & state)
 {
 	bool activated = false;
-	state.mouse_speed = window->mapPixelToCoords(sf::Vector2i(state.mouse_pos.x, state.mouse_pos.y)) -
-						window->mapPixelToCoords(sf::Vector2i(state.mouse_prev.x, state.mouse_prev.y));
 
-	curmode = Object::DEFAULT;
+	curmode = DEFAULT;
+
 	//if mouse is inside the object 
 	if (obj.contains(worldPos))
 	{
@@ -525,8 +546,8 @@ bool Object::UpdateAction(sf::RenderWindow * window, InputState & state)
 		for (auto &this_callback : callback)
 		{
 			this_callback(window, state, this); //run callback with state info
-			activated = true;
 		}
+		activated = true;
 		curmode = ACTIVE;
 	}
 
@@ -538,7 +559,12 @@ bool Object::UpdateAction(sf::RenderWindow * window, InputState & state)
 			{
 				defaultfn[i](window, state, this); //run callback with state info
 			}
+			if (focused == id && !defaultglobal[i]) activated = true;
 		}
+	}
+	else
+	{
+		activated = true;
 	}
 	action_time -= state.dt;
 
@@ -641,6 +667,10 @@ Object * Object::GetCopy()
 	return new Object(*this);
 }
 
+Object::~Object()
+{
+}
+
 void Object::Draw(sf::RenderWindow * window, InputState & state)
 {
 	//nothing to draw
@@ -680,6 +710,11 @@ void Object::SetData(void* data_ptr)
 void* Object::GetData()
 {
 	return nullptr;
+}
+
+bool Object::isCopyable()
+{
+	return true;
 }
 
 
@@ -908,6 +943,16 @@ Text::Text(Text && A)
 	*this = A;
 }
 
+void Text::AddString(std::string str)
+{
+	SetString(GetString() + str);
+}
+
+std::string Text::GetString()
+{
+	return text.get()->getString();
+}
+
 void Text::operator=(Text & A)
 {
 	copy(A);
@@ -920,7 +965,6 @@ void Text::operator=(Text & A)
 void Text::operator=(Text && A)
 {
 	copy(A);
-
 	std::swap(text, A.text);
 }
 
@@ -935,6 +979,8 @@ void Text::SetData(void* data_ptr)
 	SetString(LOCAL[*(std::string*)data_ptr]);
 }
 
+std::map<std::string, bool> Window::window_map = {};
+
 void Window::Add(Object* something, Allign a)
 {
 	objects[1].get()->AddObject(something, a);
@@ -943,6 +989,11 @@ void Window::Add(Object* something, Allign a)
 void Window::AddRef(Object* something, Allign a)
 {
 	objects[1].get()->AddReference(something, a);
+}
+
+void Window::SetUnique(bool unq)
+{
+	unique = unq;
 }
 
 Window::Window(Window & A)
@@ -966,12 +1017,16 @@ void Window::CreateCallbacks()
 	//delete callback
 	this->SetMainDefaultFunction([parent = this](sf::RenderWindow * window, InputState & state, Object* obj)
 	{
-		if (state.key_press[sf::Keyboard::Escape] == true)
+		if (focused == parent->id && state.key_press[sf::Keyboard::Escape] == true)
 		{
 			Add2DeleteQueue(parent->id);
 			parent->action_time = action_dt;
 		}
-	});
+		if (parent->unique)
+		{
+			parent->isactive = true;
+		}
+	}, true);
 
 	//drag callback
 	this->objects[0].get()->SetMainCallbackFunction([parent = this](sf::RenderWindow * window, InputState & state, Object* obj)
@@ -984,23 +1039,59 @@ void Window::AddCloseCallback(call_func cf)
 {
 	//callback function on the close button
 	this->objects[0].get()->objects[1].get()->SetCallbackFunction(cf);
+	closecallbacks.push_back(cf);
 }
 
 void Window::operator=(Window & A)
 {
 	Box::operator=(A);
+	unique = A.unique;
+	isactive = false;
+	for (auto& a : A.closecallbacks) closecallbacks.push_back(a);
 	CreateCallbacks();
 }
 
 void Window::operator=(Window && A)
 {
 	Box::operator=(A);
+	unique = A.unique;
+	isactive = false;
+	std::swap(closecallbacks, A.closecallbacks);
 	CreateCallbacks();
+}
+
+std::string Window::GetTitle()
+{
+	return ((Text*)(this->objects[0].get()->objects[0].get()))->GetString();
 }
 
 Object * Window::GetCopy()
 {
 	return static_cast<Object*>(new Window(*this));
+}
+
+bool Window::isCopyable()
+{
+	if (unique)
+	{
+		bool res = false;
+		res = !window_map[GetTitle()];
+		if (unique)	window_map[GetTitle()] = true;
+		return res;
+	}
+	return true;
+}
+
+Window::~Window()
+{
+	if (isactive)
+	{
+		window_map[GetTitle()] = false;
+	}
+	for (auto& c : closecallbacks)
+	{
+		c(nullptr, *(InputState*)nullptr/*wtf*/, this); 
+	}
 }
 
 InputState::InputState(): mouse_pos(sf::Vector2f(0,0)), mouse_speed(sf::Vector2f(0, 0))
@@ -1121,7 +1212,7 @@ MenuBox::MenuBox(float dx, float dy, bool auto_y, float x, float y, sf::Color co
 	Scroll_Slide.activestate.color_main = sf::Color(255, 100, 100, 255);
 	Inside.SetBackgroundColor(sf::Color::Transparent);
 	Scroll.SetMargin(2);
-	Inside.SetMargin(12);
+	Inside.SetMargin(0);
 	Scroll.AddObject(&Scroll_Slide, Box::CENTER);
 	this->Object::AddObject(&Inside, Box::LEFT);
 	this->Object::AddObject(&Scroll, Box::RIGHT);
@@ -1426,7 +1517,7 @@ InputBox::InputBox(float w, float h, sf::Color color_active, sf::Color color_hov
 	activestate.color_main = color_active;
 	hoverstate.color_main = color_hover;
 
-	Text inpt("kek ", LOCAL("default"), h * 0.7f, sf::Color::White);
+	Text inpt("Waiting for input", LOCAL("default"), h * 0.7f, sf::Color::White);
 
 	this->AddObject(&inpt, Allign::LEFT);
 	CreateCallbacks();
@@ -1505,6 +1596,12 @@ void* InputBox::GetData()
 std::string InputBox::GetText()
 {
 	return textstr;
+}
+
+void InputBox::SetText(std::string str, InputState &state)
+{
+	textstr = str;
+	this->RunDefaultCallback(nullptr, state);
 }
 
 Slider::Slider(float w, float h, float val, float min, float max, float dv)

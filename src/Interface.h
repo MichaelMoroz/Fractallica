@@ -150,6 +150,7 @@ public:
 	void ClearHoverFunctions();
 
 	bool RunCallback(sf::RenderWindow * window, InputState& state);
+	bool RunDefaultCallback(sf::RenderWindow* window, InputState& state);
 	void clone_states();
 
 	virtual void Draw(sf::RenderWindow * window, InputState& state);
@@ -157,6 +158,7 @@ public:
 	virtual void AddReference(Object* a, Allign b);
 	virtual void SetData(void* data_ptr);
 	virtual void* GetData();
+	virtual bool isCopyable();
 
 	void Update(sf::RenderWindow * window, InputState& state);
 	bool UpdateAction(sf::RenderWindow * window, InputState& state);
@@ -201,6 +203,8 @@ public:
 	sf::Vector2f worldPos;
 	sf::FloatRect obj;
 
+	virtual ~Object();
+
 	int id;
 };
 
@@ -234,7 +238,7 @@ public:
 
 	virtual Object* GetCopy();
 
-	~Box();
+	virtual ~Box();
 
 protected:
 	bool auto_size;
@@ -289,6 +293,7 @@ public:
 	template<class T>
 	Window(float x, float y, float dx, float dy, sf::Color color_main = default_main_color, T title = LOCAL["Window"], sf::Font & font = LOCAL("default"));
 
+	void SetUnique(bool unq);
 	Window(Window& A);
 	Window(Window&& A);
 
@@ -298,7 +303,17 @@ public:
 	void operator=(Window& A);
 	void operator=(Window&& A);
 
+	std::string GetTitle();
+
 	virtual Object* GetCopy();
+	virtual bool isCopyable();
+
+	~Window();
+
+	std::vector<call_func> closecallbacks;
+	static std::map<std::string, bool> window_map;
+	bool unique;
+	bool isactive;
 };
 
 
@@ -318,6 +333,8 @@ public:
 
 	template<class T>
 	void SetString(T str);
+	void AddString(std::string str);
+	std::string GetString();
 
 	void operator=(Text& A);
 	void operator=(Text&& A);
@@ -411,6 +428,7 @@ public:
 	virtual void* GetData();
 
 	std::string GetText();
+	void SetText(std::string str, InputState& state);
 
 	std::string textstr;
 };
@@ -471,6 +489,8 @@ inline KeyMapper::KeyMapper(T label, T act_label, int * key, float w, float h, M
 template<class T>
 inline Window::Window(float x, float y, float dx, float dy, sf::Color color_main, T title, sf::Font & font)
 {
+	unique = false;
+	isactive = false;
 	defaultstate.position.x = x;
 	defaultstate.position.y = y;
 	defaultstate.size.x = dx;
@@ -497,10 +517,9 @@ inline Window::Window(float x, float y, float dx, float dy, sf::Color color_main
 
 	MenuBox Inside(dx, dy - 30, true);
 
-
 	this->AddObject(&Bar, Box::CENTER);
 	this->AddObject(&Inside, Box::LEFT);
-
+	
 	CreateCallbacks();
 }
 

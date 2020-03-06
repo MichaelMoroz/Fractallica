@@ -12,7 +12,7 @@ function OpenMainMenu()
 	mainmenu:SetStatic(); --unchanging render order
 	mainmenu:SetPosition(0.025*interface_size.x,0.025*interface_size.y);
 
-	local margin = Box.new(1000*0.9, 5);
+	local margin = Box.new(1000*0.9, 15);
 	margin:SetBackgroundColor(Color.Transparent);
 	local title = Text.new("Fractallica", 120);
 	title:SetBorderColor(Color.Black);
@@ -35,7 +35,9 @@ function OpenMainMenu()
 	mainmenu:AddObject(margin, Allign.CENTER);
 	mainmenu:AddObject(version, Allign.LEFT);
 	mainmenu:AddObject(margin, Allign.CENTER);
+	mainmenu:AddObject(margin, Allign.CENTER);
 	mainmenu:AddObject(fcbtn, Allign.LEFT);
+	mainmenu:AddObject(margin, Allign.CENTER);
 	mainmenu:AddObject(exitbtn, Allign.LEFT);
 
 	--add a copy of the mainmenu object to the global render/update list
@@ -45,18 +47,13 @@ end;
 
 function FractalEditor()
 	local wind = Window.new(interface_size.x - 600, 0, 600, 400, "Fractal parameters");
-
+	wind:SetUnique(true);
 	local margin = Box.new(600, 15);
 	margin:SetBackgroundColor(Color.Transparent);
 
-	local fname0 = Text.new("Just a text input", 30);
-	local inbox = InputBox.new(300, 35);
-	wind:AddObject(fname0, Allign.LEFT);
-	wind:AddObject(inbox, Allign.RIGHT);
-	wind:AddObject(margin, Allign.CENTER);
 	for k, v in orderedPairs(fractal) do
 		local fname = Text.new(k, 30);
-		local val = Text.new("", 30);
+		local val = Text.new("0.000", 30);
 		local slid = Slider.new(280, 30, fractal[k], fractal_rng[k][1], fractal_rng[k][2], 0.);
 		function updateval0(object)
 			fractal[k] = object:GetValue();

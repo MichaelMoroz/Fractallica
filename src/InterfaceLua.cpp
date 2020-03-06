@@ -54,6 +54,14 @@ void WrapInterface(LuaVM* LVM)
 			obj->AddObject(obj0, Object::Allign(allign));
 			return 1;
 		});
+	LUA.setfunction("AddObject2MenuBox", [](lua_State* L) -> int
+		{
+			MenuBox* obj = *(MenuBox**)lua_touserdata(L, -3);
+			Object* obj0 = *(Object**)lua_touserdata(L, -2);
+			int allign = lua_tonumber(L, -1);
+			obj->AddObject(obj0, Object::Allign(allign));
+			return 1;
+		});
 	LUA.setfunction("SetDefaultFunction", [](lua_State* L) -> int
 		{
 			Object* obj = *(Object**)lua_touserdata(L, -3);
@@ -76,6 +84,12 @@ void WrapInterface(LuaVM* LVM)
 			obj->SetHoverFunction(c);
 			return 1;
 		});
+	LUA.setfunction("UpdateSlider", [](lua_State* L) -> int
+		{
+			MenuBox* obj = *(MenuBox**)lua_touserdata(L, -2);
+			obj->UpdateSlider();
+			return 1;
+		});
 	LUA.setfunction("SetStatic", [](lua_State* L) -> int
 		{
 			Object* obj = *(Object**)lua_touserdata(L, -1);
@@ -90,6 +104,13 @@ void WrapInterface(LuaVM* LVM)
 								//can go really bad if tried to set on something else than a text obj
 			return 1;
 		});
+	LUA.setfunction("AddText", [](lua_State* L) -> int
+		{
+			Text* obj = *(Text**)lua_touserdata(L, -2);
+			std::string text = lua_tostring(L, -1);
+			obj->AddString(text);
+			return 1;
+		});
 
 	LUA.setfunction("GetValue", [](lua_State* L) -> int
 		{
@@ -102,6 +123,12 @@ void WrapInterface(LuaVM* LVM)
 		{
 			InputBox* obj = *(InputBox**)lua_touserdata(L, -1);
 			lua_pushstring(L, obj->GetText().c_str());
+			return 1;
+		});
+	LUA.setfunction("SetRepeatLimit", [](lua_State* L) -> int
+		{
+			Object* obj = *(Object**)lua_touserdata(L, -3);
+			obj->action_time = action_dt;
 			return 1;
 		});
 
@@ -264,6 +291,13 @@ void WrapInterface(LuaVM* LVM)
 			Window* obj = *(Window**)lua_touserdata(L, -2);
 			call_func c = GetLuaCallbackFunction(L);
 			obj->AddCloseCallback(c);
+			return 1;
+		});
+	LUA.setfunction("SetUnique", [](lua_State* L) -> int
+		{
+			Window* obj = *(Window**)lua_touserdata(L, -2);
+			bool unq = lua_toboolean(L, -1);
+			obj->SetUnique(unq);
 			return 1;
 		});
 	//inheritance of Box methods

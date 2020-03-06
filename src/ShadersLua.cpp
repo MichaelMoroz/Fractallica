@@ -278,6 +278,13 @@ void WrapShaders(LuaVM* LVM)
 			glBindImageTexture(id, texid, 0, GL_FALSE, 0, RW, GL_RGBA32F);
 			return 1;
 		});
+	LUA.pushfunction("AvgIllumination", [](lua_State* L) -> int
+		{
+			sf::Texture* obj = *(sf::Texture**)lua_touserdata(L, -3);
+			lua_pushnumber(L, GetAvgIllumination(obj));
+			return 1;
+		});
+	
 
 	LUA.Clear();
 }

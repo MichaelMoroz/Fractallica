@@ -104,8 +104,10 @@ void DisplayError(std::string error_text)
 {
 	sf::Vector2f wsize = default_size;
 	Window error_window(wsize.x*0.5f - 640, wsize.y*0.5f, 1280, 215, sf::Color(100, 0, 0, 128), LOCAL["Lua compilation error"], LOCAL("default"));
-	
-	error_window.Add(new Text(error_text, LOCAL("default"), 15, sf::Color::Red), Object::Allign::LEFT);
+	Box margin(1280, 10);
+	margin.SetBackgroundColor(sf::Color::Transparent);
+	error_window.Add(new Text(error_text, LOCAL("default"), 20, sf::Color::Red), Object::Allign::LEFT);
+	error_window.Add(&margin, Object::Allign::CENTER);
 
 	error_window.Add(new Button(LOCAL["Ok"], 240, 40,
 		[](sf::RenderWindow * window, InputState & state, Object* this_obj)
@@ -113,6 +115,7 @@ void DisplayError(std::string error_text)
 			
 		},
 		sf::Color(200, 40, 0, 255), sf::Color(128, 128, 128, 128)), Object::Allign::RIGHT);
+	error_window.Add(&margin, Object::Allign::CENTER);
 
 	int id = AddGlobalObject(error_window);
 
@@ -127,16 +130,17 @@ void DisplayMessage(std::string text)
 {
 	sf::Vector2f wsize = default_size;
 	Window error_window(wsize.x * 0.5f - 640, wsize.y * 0.5f, 1280, 215, sf::Color(100, 100, 100, 128), LOCAL["Information"], LOCAL("default"));
-
+	Box margin(1280, 10);
+	margin.SetBackgroundColor(sf::Color::Transparent);
 	error_window.Add(new Text(text, LOCAL("default"), 15, sf::Color::White), Object::Allign::LEFT);
-
+	error_window.Add(&margin, Object::Allign::CENTER);
 	error_window.Add(new Button(LOCAL["Ok"], 240, 40,
 		[](sf::RenderWindow* window, InputState& state, Object* this_obj)
 		{
 
 		},
 		sf::Color(200, 40, 0, 255), sf::Color(128, 128, 128, 128)), Object::Allign::RIGHT);
-
+	error_window.Add(&margin, Object::Allign::CENTER);
 	int id = AddGlobalObject(error_window);
 
 	get_glob_obj(id).objects[1].get()->objects[0].get()->objects[1].get()->SetCallbackFunction(
@@ -317,6 +321,20 @@ void GameOpLua()
 	LUA.pushfunction("isGUIactive", [](lua_State* L) -> int
 		{
 			lua_pushboolean(L, gui_activated);
+			return 1;
+		});
+
+	LUA.pushfunction("dostring", [](lua_State* L) -> int
+		{
+			std::string code = lua_tostring(L, -1);
+			LUA.DoString(code);
+			std::string err = "";
+			auto e = LUA.check_error_msg();
+			if (e.first != LUA_OK)
+			{
+				err = e.second;
+			}
+			lua_pushstring(L, err.c_str());
 			return 1;
 		});
 

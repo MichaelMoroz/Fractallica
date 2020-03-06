@@ -42,7 +42,5 @@ dofile( "scripts/menus/input_test.lua" );
 dofile( "scripts/menus/debug.lua" );
 
 OpenMainMenu();
-OpenDebugInfo();
-FractalEditor();
 --intialize the shader
 dofile( "scripts/compute/simple.lua" );

@@ -10,6 +10,14 @@ else
 	Free_Camera_Update();
 end;
 
+if(IsButtonPressed(Key.Tilde)) then
+	OpenConsole();
+end;
+
+if(IsButtonPressed(Key.F1)) then
+	OpenDebugInfo();
+end;
+
 frame = frame + 1;
 camera:Update(0.0001);
 wind_size = GetWindowSize();
