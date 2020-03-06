@@ -1212,7 +1212,7 @@ MenuBox::MenuBox(float dx, float dy, bool auto_y, float x, float y, sf::Color co
 	Scroll_Slide.activestate.color_main = sf::Color(255, 100, 100, 255);
 	Inside.SetBackgroundColor(sf::Color::Transparent);
 	Scroll.SetMargin(2);
-	Inside.SetMargin(0);
+	Inside.SetMargin(2);
 	Scroll.AddObject(&Scroll_Slide, Box::CENTER);
 	this->Object::AddObject(&Inside, Box::LEFT);
 	this->Object::AddObject(&Scroll, Box::RIGHT);

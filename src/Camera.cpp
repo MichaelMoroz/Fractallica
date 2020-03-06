@@ -33,9 +33,10 @@ void Camera::SetRotation(float a, float b, float c)
 {
 	vec3 Euler(a, b, c);
 	quat rotation(Euler);
-	dirx = rotation*quat(0, 1, 0, 0);
-	diry = rotation*quat(0, 0, 1, 0);
-	dirz = rotation*quat(0, 0, 0, 1);
+	mat3 rot = glm::mat3_cast(rotation);
+	dirx = quat(0, rot * vec3(1, 0, 0));
+	diry = quat(0, rot * vec3(0, 1, 0));
+	dirz = quat(0, rot * vec3(0, 0, 1));
 }
 
 //k = 0 - absolutely sharp movements, 1 - infinitely smooth movements, best ~0.1
