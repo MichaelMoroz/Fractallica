@@ -33,22 +33,33 @@ command_str = "";
 console_obj_delta = nil;
 
 --global copy of the consolelog object
-consolelog = MenuBox.new(500, 500);
+consolelog = MenuBox.new(796, 600);
 
 function Add2Console(obj)
 	console_obj_delta = obj;
 end;
 
+function PrintConsole(text)
+	Add2Console(Text.new(text,20));
+end;
+
+newlinemargin = Box.new(796, 0);
+newlinemargin:SetBackgroundColor(Color.Transparent);
+
 function Add2ConsoleLog(object)
 	if(console_log_delta ~= "") then
 		object:AddObject2MenuBox(Text.new(console_log_delta, 20),Allign.LEFT);
+		object:AddObject2MenuBox(newlinemargin,Allign.LEFT);
 		consolelog:AddObject2MenuBox(Text.new(console_log_delta, 20),Allign.LEFT);
+		consolelog:AddObject2MenuBox(newlinemargin,Allign.LEFT);
 		console_log_delta = "";
 		object:SetRepeatLimit();
 	end;
 	if(console_obj_delta ~= nil) then
 		object:AddObject2MenuBox(console_obj_delta,Allign.LEFT);
+		object:AddObject2MenuBox(newlinemargin,Allign.LEFT);
 		consolelog:AddObject2MenuBox(console_obj_delta,Allign.LEFT);
+		consolelog:AddObject2MenuBox(newlinemargin,Allign.LEFT);
 		console_obj_delta = nil;
 		object:SetRepeatLimit();
 	end;
@@ -57,18 +68,22 @@ end;
 consolelog:SetDefaultFunction(true, Add2ConsoleLog);
 
 function OpenConsole()
-	local wind0 = Window.new(100, 100, 500, 500, "Console");
+	local wind0 = Window.new(100, 100, 800, 500, "Console");
 	wind0:SetUnique(true);
 	
 	function execcommand(object)
         clicksound:Play();
-		console_log = console_log..">>"..command_str.."\n"
+		console_log = console_log..">>"..command_str;
         local err = dostring(command_str);
-		console_log = console_log..err.."\n";
-		console_log_delta = ">>"..command_str.."\n"..err.."\n";
+		console_log = console_log.."\n"..err.."\n";
+		if(err == "") then
+			console_log_delta = ">>"..command_str;
+		else
+			console_log_delta = ">>"..command_str.."\n"..err;
+		end;	
     end;
 	
-	local command = InputBox.new(400, 35);
+	local command = InputBox.new(700, 35);
     function updatestr(object)
         command_str = object:GetText();
 		if(IsButtonPressed(Key.Enter)) then
@@ -86,3 +101,7 @@ function OpenConsole()
 	wind0:AddObject(runbtn, Allign.RIGHT);
 	AddGlobalObject(wind0);
 end;
+
+console_title_str = Text.new("Fractallica Alpha "..GetVersion().." - Lua command console", 30);
+console_title_str:SetBackgroundColor(Color.Yellow);
+Add2Console(console_title_str);
