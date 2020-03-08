@@ -1,5 +1,8 @@
 # Lua documentation
 
+## Developer tips
+* [Using the developer console and debug menu](https://github.com/MichaelMoroz/Fractallica/blob/master/docs/devconsole.md)
+
 ## Lua scripts
 * [loop.lua](https://github.com/MichaelMoroz/Fractallica/blob/master/docs/looplua.md)
 * [render.lua](https://github.com/MichaelMoroz/Fractallica/blob/master/docs/renderlua.md)
