@@ -11,3 +11,5 @@ The developer console consists of a command log and command prompt with a `Send`
 * `CURRENT_MODE = GAME_MODES.<gamemode>` - Set gamemode.
 * `OpenDebugInfo()` - Alternative way to open debug menu.
 * `FractalEditor()` - Open fractal editor.
+
+Of course, you can use any other Lua command.
