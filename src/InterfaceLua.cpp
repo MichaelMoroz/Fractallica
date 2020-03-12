@@ -46,6 +46,49 @@ void WrapInterface(LuaVM* LVM)
 			obj->SetBorderWidth(w);
 			return 1;
 		});
+	LUA.setfunction("SetSize", [](lua_State* L) -> int
+		{
+			Object* obj = *(Object**)lua_touserdata(L, -3);
+			float w = lua_tonumber(L, -2);
+			float h = lua_tonumber(L, -1);
+			obj->SetSize(w,h);
+			return 1;
+		});
+	LUA.setfunction("SetHeigth", [](lua_State* L) -> int
+		{
+			Object* obj = *(Object**)lua_touserdata(L, -2);
+			float h = lua_tonumber(L, -1);
+			obj->SetHeigth(h);
+			return 1;
+		});
+	LUA.setfunction("SetWidth", [](lua_State* L) -> int
+		{
+			Object* obj = *(Object**)lua_touserdata(L, -2);
+			float w = lua_tonumber(L, -1);
+			obj->SetWidth(w);
+			return 1;
+		});
+	LUA.setfunction("SetMargin", [](lua_State* L) -> int
+		{
+			Object* obj = *(Object**)lua_touserdata(L, -2);
+			float w = lua_tonumber(L, -1);
+			obj->SetMargin(w);
+			return 1;
+		});
+	LUA.setfunction("SetScroll", [](lua_State* L) -> int
+		{
+			Object* obj = *(Object**)lua_touserdata(L, -2);
+			float w = lua_tonumber(L, -1);
+			obj->SetScroll(w);
+			return 1;
+		});
+	LUA.setfunction("SetBorderColor", [](lua_State* L) -> int
+		{
+			Object* obj = *(Object**)lua_touserdata(L, -2);
+			vec4 color = **(vec4**)lua_touserdata(L, -1) * 255.f;
+			obj->SetBorderColor(sf::Color((int)color.x, (int)color.y, (int)color.z, (int)color.w));
+			return 1;
+		});
 	LUA.setfunction("AddObject", [](lua_State* L) -> int
 		{
 			Object* obj = *(Object**)lua_touserdata(L, -3);
@@ -116,6 +159,16 @@ void WrapInterface(LuaVM* LVM)
 		{
 			Slider* obj = *(Slider**)lua_touserdata(L, -1);
 			lua_pushnumber(L, obj->GetValue());			
+			return 1;
+		});
+	LUA.setfunction("GetObject", [](lua_State* L) -> int
+		{
+			Object* obj = *(Object**)lua_touserdata(L, -1);
+			int i = lua_tonumber(L, -1);
+			Object* o = *(Object**)lua_newuserdata(L, sizeof(void*));
+			o = obj->objects[i].get();
+			luaL_getmetatable(L, "ObjectPtr");
+			lua_setmetatable(L, -2);
 			return 1;
 		});
 
